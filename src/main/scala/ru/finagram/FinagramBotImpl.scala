@@ -116,7 +116,7 @@ private[finagram] class FinagramBotImpl(
       // invoke handler for text message
       case Some(TextMessage(_, _, _, _, text)) if handlers.contains(text) =>
         log.debug(s"Invoke handler for message ${message.get}")
-        handlers(text)(message.get)
+        Future(handlers(text)(message.get))
           .map(answer => Some(answer))
       case None =>
         log.debug("Message is empty")

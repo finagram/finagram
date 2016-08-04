@@ -28,10 +28,6 @@ trait FinagramBot extends Runnable {
    */
   val token: String
 
-  val answer = AnswerBuilder
-
-  val replay = ReplayBuilder
-
   /**
    * Run the bot.
    * This method will block thread.
@@ -65,7 +61,7 @@ trait FinagramBot extends Runnable {
    * @param text Text from user. Cannot be empty.
    * @param handler Logic for create answer for received text.
    */
-  final def on(text: String)(handler: (Message) => Future[Answer]): Unit = {
+  final def on(text: String)(handler: (Message) => Answer): Unit = {
     if (text.trim.isEmpty) {
       throw new IllegalArgumentException("Text cannot be empty")
     }
@@ -96,6 +92,6 @@ trait FinagramBot extends Runnable {
 }
 
 object FinagramBot {
-  type Handler = (Message) => Future[Answer]
+  type Handler = (Message) => Answer
 }
 
