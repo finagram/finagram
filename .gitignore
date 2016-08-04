@@ -15,3 +15,4 @@ project/boot/
 
 ### Files with token
 *.token
+example.conf
