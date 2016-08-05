@@ -2,7 +2,7 @@ package ru.finagram
 
 import java.util.concurrent.TimeUnit
 
-import com.twitter.finagle.Service
+import com.twitter.finagle.{ Http, Service }
 import com.twitter.finagle.http.{ Method, Request, Response, Status, Message => _ }
 import com.twitter.util._
 import org.json4s.native.JsonMethods._
@@ -14,36 +14,21 @@ import ru.finagram.api._
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
  */
-private[finagram] class FinagramBotImpl(
-  val token: String,
-  val http: Service[Request, Response],
-  val handlers: Map[String, Handler],
-  val errorHandler: PartialFunction[Throwable, Unit],
+private[finagram] trait Polling extends Runnable {
+  val token: String
+  val handlers: Map[String, Handler]
+  val errorHandler: PartialFunction[Throwable, Unit]
   val log: Logger
-) {
 
   /**
-   * Invoked request, handle response with custom logic and send bot answer
+   * Asynchronous http client.
    */
-  private[finagram] lazy val logic: (Long) => Future[Long] = (offset) => {
-    // invoke request
-    http(getUpdateRequest(offset)).map(verifyResponse)
-      // extract update
-      .map(extractUpdateFromResponse).flatMap {
-      case Some(update) =>
-        // invoke custom logic for handle update and take new offset
-        handleUpdateAndExtractNewOffset(update)
-      case None =>
-        // just use current offset again
-        Future(offset)
-    }.handle(
-      // if something was wrong we should try handle message again from current offset
-      errorHandler.orElse(defaultErrorHandler).andThen(_ => offset)
-    )
-  }
+  private[finagram] val http = Http.client
+    .withTls("api.telegram.org")
+    .newService("api.telegram.org:443")
 
   /**
-   * Timer for repeat [[logic]]
+   * Timer for repeat [[poll]]
    */
   private[finagram] val timer = new JavaTimer(true)
   /**
@@ -59,12 +44,29 @@ private[finagram] class FinagramBotImpl(
 
   /**
    * Run process of get updates from Telegram.
-   *
-   * @param init initial offset
-   * @return fist not handled offset
    */
-  def getUpdates(init: Long): Future[Long] = {
-    repeat(logic, init)
+  override final def run(): Unit = {
+    repeat(poll, 0)
+  }
+
+  /**
+   * Invoked request, handle response with custom logic and send bot answer
+   */
+  private[finagram] def poll(offset: Long): Future[Long] = {
+    // invoke request
+    http(getUpdateRequest(offset)).map(verifyResponse)
+      // extract update
+      .map(extractUpdateFromResponse).flatMap {
+      case Some(update) =>
+        // invoke custom logic for handle update and take new offset
+        handleUpdateAndExtractNewOffset(update)
+      case None =>
+        // just use current offset again
+        Future(offset)
+    }.handle(
+      // if something was wrong we should try handle message again from current offset
+      errorHandler.orElse(defaultErrorHandler).andThen(_ => offset)
+    )
   }
 
   /**

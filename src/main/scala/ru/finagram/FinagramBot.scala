@@ -3,9 +3,7 @@ package ru.finagram
 import java.io.FileNotFoundException
 import java.nio.file.Paths
 
-import com.twitter.finagle.Http
 import com.twitter.finagle.http.{ Message => _ }
-import com.twitter.util._
 import org.slf4j.LoggerFactory
 import ru.finagram.FinagramBot.Handler
 import ru.finagram.api._
@@ -16,7 +14,7 @@ import scala.io.Source
 /**
  * Trait for implementation of the bot logic.
  */
-trait FinagramBot extends Runnable {
+trait FinagramBot extends Polling {
 
   // Logic for handle messages from user
   val log = LoggerFactory.getLogger(getClass)
@@ -27,25 +25,6 @@ trait FinagramBot extends Runnable {
    * Token of the bot.
    */
   val token: String
-
-  /**
-   * Run the bot.
-   * This method will block thread.
-   */
-  override final def run(): Unit = {
-    val impl = new FinagramBotImpl(
-      token = token,
-      http = Http.client
-        .withTls("api.telegram.org")
-        .newService("api.telegram.org:443"),
-      handlers = handlers.toMap,
-      errorHandler = onError,
-      log = log
-    )
-    // FIXME offset should be took from persistence storage
-    log.info("run!")
-    Await result impl.getUpdates(0)
-  }
 
   /**
    * Handle any errors.

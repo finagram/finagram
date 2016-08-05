@@ -16,7 +16,7 @@ class FinagramBotImplSpec extends Spec {
     (implicit errorHandler: PartialFunction[Throwable, Unit]) = {
     val token = randomString()
     val http = mock[Service[Request, Response]]
-    val bot = new FinagramBotImpl(
+    val bot = new Polling(
       token,
       http,
       handlers.toMap,
