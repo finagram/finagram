@@ -48,15 +48,15 @@ case class User(id: Int, firstName: String, lastName: Option[String], username: 
 case class Chat(
   id: Long,
   `type`: String,
-  title: Option[String],
-  firstName: Option[String],
-  lastName: Option[String],
-  username: Option[String]
+  title: Option[String] = None,
+  firstName: Option[String] = None,
+  lastName: Option[String] = None,
+  username: Option[String] = None
 )
 
 /**
  * This class represents one size of a photo or a file / sticker thumbnail.
- * 
+ *
  * @param fileId Unique identifier for this file.
  * @param width Photo width.
  * @param height Photo height.

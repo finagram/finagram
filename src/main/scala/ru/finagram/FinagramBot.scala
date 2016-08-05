@@ -1,8 +1,5 @@
 package ru.finagram
 
-import java.io.FileNotFoundException
-import java.nio.file.Paths
-
 import com.twitter.finagle.http.{ Message => _ }
 import com.twitter.util.{ Throw, Try }
 import org.slf4j.LoggerFactory
@@ -10,7 +7,6 @@ import ru.finagram.FinagramBot.Handler
 import ru.finagram.api._
 
 import scala.collection.mutable
-import scala.io.Source
 
 /**
  * Trait for implementation of the bot logic.
@@ -69,25 +65,6 @@ trait FinagramBot {
       case _ =>
         Throw(new NotHandledMessageException("Received not handled message: " + message))
     }
-  }
-
-  /**
-   * Read all from resources (if resource with specified path exists) or from file
-   * and return content as [[String]].
-   *
-   * @param path path to resource or file.
-   * @return content from resource or file.
-   */
-  final def from(path: String): String = {
-    val source = Option(getClass.getResource(path)) match {
-      case Some(url) =>
-        Source.fromURL(url)
-      case None if Paths.get(path).toFile.exists() =>
-        Source.fromFile(path)
-      case _ =>
-        throw new FileNotFoundException(s"No resource or file was not found by path $path")
-    }
-    source.mkString
   }
 }
 
