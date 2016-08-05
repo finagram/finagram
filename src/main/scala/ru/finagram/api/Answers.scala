@@ -1,6 +1,6 @@
 package ru.finagram.api
 
-trait AnswerFactory {
+trait Answers {
 
   final def text(text: String, disableNotification: Option[Boolean] = None)(message: Message) = {
     FlatAnswer(

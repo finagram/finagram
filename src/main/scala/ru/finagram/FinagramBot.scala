@@ -4,6 +4,7 @@ import java.io.FileNotFoundException
 import java.nio.file.Paths
 
 import com.twitter.finagle.http.{ Message => _ }
+import com.twitter.util.{ Throw, Try }
 import org.slf4j.LoggerFactory
 import ru.finagram.FinagramBot.Handler
 import ru.finagram.api._
@@ -14,7 +15,9 @@ import scala.io.Source
 /**
  * Trait for implementation of the bot logic.
  */
-trait FinagramBot extends Polling {
+trait FinagramBot {
+
+  this: MessageReceiver =>
 
   // Logic for handle messages from user
   val log = LoggerFactory.getLogger(getClass)
@@ -30,7 +33,7 @@ trait FinagramBot extends Polling {
    * Handle any errors.
    */
   def onError: PartialFunction[Throwable, Unit] = {
-    case e: Throwable => log.error("", e)
+    case e => log.error("Something wrong", e)
   }
 
   /**
@@ -48,6 +51,24 @@ trait FinagramBot extends Polling {
       throw new IllegalArgumentException(s"Handler for command $text already registered.")
     }
     handlers(text) = handler
+  }
+
+  /**
+   * Create answer for message.
+   *
+   * @param message Message from Telegram.
+   * @return answer.
+   */
+  override final def handle(message: Message): Try[Answer] = {
+    message match {
+      // invoke handler for text message
+      case TextMessage(_, _, _, _, text) if handlers.contains(text) =>
+        log.debug(s"Invoke handler for message $message")
+        Try(handlers(text)(message))
+      // TODO add support of other message types
+      case _ =>
+        Throw(new NotHandledMessageException("Received not handled message: " + message))
+    }
   }
 
   /**

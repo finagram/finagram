@@ -1,9 +1,9 @@
 package ru.finagram.api
 
 import com.typesafe.config.ConfigFactory
-import ru.finagram.FinagramBot
+import ru.finagram.{ FinagramBot, Polling }
 
-object FinagramExampleBot extends App with FinagramBot with AnswerFactory {
+object FinagramExampleBot extends App with FinagramBot with Polling with Answers {
   override val token: String = ConfigFactory.load("example.conf").getString("token")
 
   on("/text") {
@@ -23,4 +23,8 @@ object FinagramExampleBot extends App with FinagramBot with AnswerFactory {
   }
 
   run()
+
+  /**
+   * Handle any errors.
+   */
 }

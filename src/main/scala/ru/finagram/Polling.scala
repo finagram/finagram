@@ -2,31 +2,27 @@ package ru.finagram
 
 import java.util.concurrent.TimeUnit
 
-import com.twitter.finagle.{ Http, Service }
+import com.twitter.finagle.Http
 import com.twitter.finagle.http.{ Method, Request, Response, Status, Message => _ }
 import com.twitter.util._
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, JObject }
 import org.slf4j.Logger
-import ru.finagram.FinagramBot.Handler
 import ru.finagram.api._
 
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
  */
-private[finagram] trait Polling extends Runnable {
+private[finagram] trait Polling extends MessageReceiver {
   val token: String
-  val handlers: Map[String, Handler]
-  val errorHandler: PartialFunction[Throwable, Unit]
+  def onError: PartialFunction[Throwable, Unit]
   val log: Logger
-
   /**
    * Asynchronous http client.
    */
   private[finagram] val http = Http.client
     .withTls("api.telegram.org")
     .newService("api.telegram.org:443")
-
   /**
    * Timer for repeat [[poll]]
    */
@@ -46,7 +42,7 @@ private[finagram] trait Polling extends Runnable {
    * Run process of get updates from Telegram.
    */
   override final def run(): Unit = {
-    repeat(poll, 0)
+    Await result repeat(poll, 0L)
   }
 
   /**
@@ -65,7 +61,7 @@ private[finagram] trait Polling extends Runnable {
         Future(offset)
     }.handle(
       // if something was wrong we should try handle message again from current offset
-      errorHandler.orElse(defaultErrorHandler).andThen(_ => offset)
+      onError.orElse(defaultErrorHandler).andThen(_ => offset)
     )
   }
 
@@ -115,15 +111,17 @@ private[finagram] trait Polling extends Runnable {
    */
   private[finagram] def takeAnswerFor(message: Option[Message]): Future[Option[Answer]] = {
     message match {
-      // invoke handler for text message
-      case Some(TextMessage(_, _, _, _, text)) if handlers.contains(text) =>
-        log.debug(s"Invoke handler for message ${message.get}")
-        Future(handlers(text)(message.get))
-          .map(answer => Some(answer))
+      case Some(msg) =>
+        Future(handle(msg) match {
+          case Return(answer) =>
+            Some(answer)
+          case Throw(e) =>
+            log.error(s"Exception on handle message $message", e)
+            None
+        })
       case None =>
         log.debug("Message is empty")
         Future.None
-      // TODO add support of other message types
       case _ =>
         log.debug("Received not handled message: " + message)
         Future.None
