@@ -3,7 +3,6 @@ package ru.finagram
 import com.twitter.finagle.http.{ Message => _ }
 import com.twitter.util.{ Throw, Try }
 import org.slf4j.LoggerFactory
-import ru.finagram.FinagramBot.Handler
 import ru.finagram.api._
 
 import scala.collection.mutable
@@ -18,7 +17,7 @@ trait FinagramBot {
   // Logic for handle messages from user
   val log = LoggerFactory.getLogger(getClass)
 
-  private val handlers = mutable.Map[String, Handler]()
+  private val handlers = mutable.Map[String, (Message) => Answer]()
 
   /**
    * Token of the bot.
@@ -66,9 +65,5 @@ trait FinagramBot {
         Throw(new NotHandledMessageException("Received not handled message: " + message))
     }
   }
-}
-
-object FinagramBot {
-  type Handler = (Message) => Answer
 }
 

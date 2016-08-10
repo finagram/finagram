@@ -49,6 +49,7 @@ trait Polling extends MessageReceiver {
    * Invoked request, handle response with custom logic and send bot answer
    */
   private[finagram] def poll(offset: Long): Future[Long] = {
+    // TODO add support of some Updates
     // invoke request
     http(getUpdateRequest(offset)).map(verifyResponse)
       // extract update
@@ -72,7 +73,7 @@ trait Polling extends MessageReceiver {
    * @return http request
    */
   private def getUpdateRequest(offset: Long): Request = {
-    Request(Method.Get, s"/bot$token/getUpdates?offset=$offset&limit=1")
+    Request(Method.Get, s"/bot$token/getUpdates?offset=$offset&limit=10")
   }
 
   /**

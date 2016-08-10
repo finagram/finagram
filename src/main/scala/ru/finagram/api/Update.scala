@@ -12,6 +12,8 @@ import org.json4s.native.JsonMethods._
  */
 private[finagram] case class Update(updateId: Long, message: Option[Message])
 
+// TODO write Updates
+
 private[finagram] object Update {
   implicit val formats = DefaultFormats
 

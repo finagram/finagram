@@ -4,6 +4,7 @@ import java.util.UUID
 
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{ Request, Response }
+import com.twitter.util.Future
 import org.mockito.Mockito._
 import org.mockito.verification.VerificationWithTimeout
 import org.mockito.{ ArgumentCaptor, Mockito }
@@ -36,7 +37,7 @@ trait Spec extends FunSpecLike with Matchers with ShouldVerb {
 
   def clientWithResponse(response: Response): Service[Request, Response] = {
     val http = mock[Service[Request, Response]]
-    doReturn(response).when(http).apply(any[Request])
+    doReturn(Future(response)).when(http).apply(any[Request])
     http
   }
 
