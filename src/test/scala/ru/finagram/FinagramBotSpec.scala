@@ -2,6 +2,8 @@ package ru.finagram
 
 import ru.finagram.api.{ Answers, Chat, FlatAnswer, TextMessage }
 
+import scala.util.Random
+
 class FinagramBotSpec extends Spec {
 
   trait TestBot extends FinagramBot with MessageReceiver with Answers {
@@ -12,7 +14,7 @@ class FinagramBotSpec extends Spec {
   describe("handle message") {
     it("should invoke registered handler") {
       // given:
-      val chat = Chat(12L, randomString())
+      val chat = Chat(12L, Random.nextString(12))
       val bot = new AnyRef() with TestBot {
         on("/command") {
           text("it's work!")

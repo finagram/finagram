@@ -2,6 +2,8 @@ package ru.finagram
 
 import java.util.UUID
 
+import com.twitter.finagle.Service
+import com.twitter.finagle.http.{ Request, Response }
 import org.mockito.Mockito._
 import org.mockito.verification.VerificationWithTimeout
 import org.mockito.{ ArgumentCaptor, Mockito }
@@ -32,5 +34,15 @@ trait Spec extends FunSpecLike with Matchers with ShouldVerb {
     Mockito.timeout(duration.toMillis.toInt)
   }
 
-  def randomString(): String = UUID.randomUUID().toString
+  def clientWithResponse(response: Response): Service[Request, Response] = {
+    val http = mock[Service[Request, Response]]
+    doReturn(response).when(http).apply(any[Request])
+    http
+  }
+
+  def responseWithContent(content: String): Response = {
+    val response = Response()
+    response.contentString = content
+    response
+  }
 }

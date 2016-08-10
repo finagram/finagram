@@ -13,7 +13,7 @@ import ru.finagram.api._
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
  */
-private[finagram] trait Polling extends MessageReceiver {
+trait Polling extends MessageReceiver {
   val token: String
   def onError: PartialFunction[Throwable, Unit]
   val log: Logger
@@ -26,15 +26,15 @@ private[finagram] trait Polling extends MessageReceiver {
   /**
    * Timer for repeat [[poll]]
    */
-  private[finagram] val timer = new JavaTimer(true)
+  private val timer = new JavaTimer(true)
   /**
    * Default formats for json.
    */
-  private[finagram] implicit val formats = DefaultFormats
+  private implicit val formats = DefaultFormats
   /**
    * Default error handler
    */
-  private[finagram] val defaultErrorHandler: PartialFunction[Throwable, Unit] = {
+  private val defaultErrorHandler: PartialFunction[Throwable, Unit] = {
     case e => log.warn("Not handled exception", e)
   }
 
@@ -71,7 +71,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @param offset number of the last handled update.
    * @return http request
    */
-  private[finagram] def getUpdateRequest(offset: Long): Request = {
+  private def getUpdateRequest(offset: Long): Request = {
     Request(Method.Get, s"/bot$token/getUpdates?offset=$offset&limit=1")
   }
 
@@ -81,7 +81,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @param response response from Telegram after request updates.
    * @return [[Update]] or [[None]]
    */
-  private[finagram] def extractUpdateFromResponse(response: Response): Option[Update] = {
+  private def extractUpdateFromResponse(response: Response): Option[Update] = {
     val content = response.contentString
     log.debug(s"Received content: $content")
     Update(content)
@@ -94,7 +94,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @param update [[Update]] object from Telegram's response.
    * @return next offset.
    */
-  private[finagram] def handleUpdateAndExtractNewOffset(update: Update): Future[Long] = {
+  private def handleUpdateAndExtractNewOffset(update: Update): Future[Long] = {
     takeAnswerFor(update.message)
       .flatMap(sendAnswer)
       .map(verifyResponse)
@@ -109,7 +109,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @param message message from Telegram's response.
    * @return custom bot answer to message or [[None]].
    */
-  private[finagram] def takeAnswerFor(message: Option[Message]): Future[Option[Answer]] = {
+  private def takeAnswerFor(message: Option[Message]): Future[Option[Answer]] = {
     message match {
       case Some(msg) =>
         Future(handle(msg) match {
@@ -134,7 +134,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @param opt custom bot answer to message or [[None]].
    * @return http response.
    */
-  private[finagram] def sendAnswer(opt: Option[Answer]): Future[Response] = opt match {
+  private def sendAnswer(opt: Option[Answer]): Future[Response] = opt match {
     case Some(answer) =>
       http(postAnswer(answer))
         .onSuccess(response => log.debug("Response to answer:\n" + response.contentString))
@@ -148,7 +148,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @param answer custom bot answer to message.
    * @return http request.
    */
-  private[finagram] def postAnswer(answer: Answer): Request = {
+  private def postAnswer(answer: Answer): Request = {
     val content = compact(render(Extraction.decompose(answer).snakizeKeys))
     log.trace(s"Prepared answer $content")
 
@@ -174,7 +174,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @return received response.
    * @throws UnexpectedResponseException if response contains wrong status or illegal content.
    */
-  private[finagram] def verifyResponse(res: Response): Response = {
+  private def verifyResponse(res: Response): Response = {
     if (!(200 to 299).contains(res.statusCode)) {
       throw new UnexpectedResponseException("Unexpected response status " + res.status)
     }
@@ -199,7 +199,7 @@ private[finagram] trait Polling extends MessageReceiver {
    * @tparam T type of action result.
    * @return last invoked future.
    */
-  private[finagram] def repeat[T](action: (T) => Future[T], init: T): Future[T] = {
+  private def repeat[T](action: (T) => Future[T], init: T): Future[T] = {
     action(init).delayed(Duration(1300, TimeUnit.MILLISECONDS))(timer).transform {
       case Return(result) =>
         repeat(action, result)
