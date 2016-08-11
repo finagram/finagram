@@ -6,7 +6,7 @@ import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
 import org.slf4j.{ Logger, LoggerFactory }
-import ru.finagram.api.{ Answer, Message, Update, Updates }
+import ru.finagram.api._
 
 class PollingSpec extends Spec with RandomObjects {
 
@@ -18,13 +18,16 @@ class PollingSpec extends Spec with RandomObjects {
       val token = randomString()
       val offset = randomInt()
       val answer = mock[Answer]
-      val http = clientWithResponse(responseWithContent(toJsonString(randomTextMessage())))
-      val poll = new TestPolling(token, http, (_) => answer)
+      val updates = randomUpdates(1)
+      val http = clientWithResponse(responseWithContent(toJsonString(updates)))
+      val polling = new TestPolling(token, http, (_) => answer)
 
       // when:
-      Await result poll.poll(offset)
+      val nextOffset = Await result polling.poll(offset)
 
       // then:
+      nextOffset should be(updates.result.last.updateId + 1)
+
       val captor = argumentCaptor[Request]
       verify(http).apply(captor.capture())
       val request = captor.getValue
@@ -36,18 +39,15 @@ class PollingSpec extends Spec with RandomObjects {
       // given:
       val token = randomString()
       val answer = mock[Answer]
-      val http = clientWithResponse(responseWithContent(toJsonString(
-        randomTextMessage(),
-        randomTextMessage(),
-        randomTextMessage()
-      )))
-      val poll = spy(new TestPolling(token, http, (_) => answer))
+      val updates = randomUpdates(3)
+      val http = clientWithResponse(responseWithContent(toJsonString(updates)))
+      val polling = spy(new TestPolling(token, http, (_) => answer))
 
       // when:
-      Await result poll.poll(0)
+      Await result polling.poll(0)
 
       // then:
-      verify(poll, times(3)).handle(any[Message])
+      verify(polling, times(3)).handle(any[Message])
     }
   }
 
@@ -57,13 +57,15 @@ class PollingSpec extends Spec with RandomObjects {
     answer: (Message) => Answer
   ) extends Polling {
     override val log: Logger = PollingSpec.this.log
-    override def handle(message: Message): Try[Answer] = Try(answer(message))
-    override def onError: PartialFunction[Throwable, Unit] = { case _ => }
+    override def handle(message: Message): Try[Answer] = {
+      Try(answer(message))
+    }
+    override def onError: PartialFunction[Throwable, Unit] = { case e => throw e }
   }
 
-  private def toJsonString(messages: Message*): String = {
+  private def toJsonString(updates: Updates): String = {
     implicit val formats = DefaultFormats + FieldSerializer[Response]()
-    val result = messages.map(m => Update(randomInt(), Some(m)))
-    compact(render(Extraction.decompose(Updates(result)).snakizeKeys))
+    val str = compact(render(Extraction.decompose(updates).snakizeKeys))
+    str
   }
 }

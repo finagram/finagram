@@ -6,9 +6,9 @@ import com.twitter.finagle.Http
 import com.twitter.finagle.http.{ Method, Request, Response, Status, Message => _ }
 import com.twitter.util._
 import org.json4s.native.JsonMethods._
-import org.json4s.{ DefaultFormats, Extraction, JObject }
+import org.json4s.{ DefaultFormats, Extraction }
 import org.slf4j.Logger
-import ru.finagram.api.{ TelegramException, Update, Updates, Response => TelegramResponse }
+import ru.finagram.api.{ Answer, Message, StickerAnswer, TelegramException, TextAnswer, Update, Updates, Response => TelegramResponse }
 
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
@@ -49,7 +49,7 @@ trait Polling extends MessageReceiver {
   /**
    * Invoked request, handle response with custom logic and send bot answer
    */
-  private[finagram] def poll(offset: Long): Future[Long] = {
+  private[finagram] final def poll(offset: Long): Future[Long] = {
     http(getUpdateRequest(offset)).map(verifyResponseStatus)
       .map(extractUpdatesFromResponse)
       .flatMap(handleUpdatesAndExtractNewOffset)
@@ -79,9 +79,10 @@ trait Polling extends MessageReceiver {
    */
   private def extractUpdatesFromResponse(response: Response): Seq[Update] = {
     val content = response.contentString
-    log.debug(s"Received content: $content")
+    log.trace(s"Received content: $content")
     Try(TelegramResponse(content)) match {
       case Return(Updates(result)) =>
+        log.debug(s"Received ${result.size} updates")
         result
       case Return(e: TelegramException) =>
         throw e
@@ -98,11 +99,14 @@ trait Polling extends MessageReceiver {
    * @return next offset.
    */
   private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Long] = {
-    takeAnswerFor(update.message)
-      .flatMap(sendAnswer)
-      .map(verifyResponseStatus)
-      // increment offset
-      .map(_ => update.updateId + 1)
+    log.debug("Updates count: " + updates.size)
+    Future.collect(updates.map { update =>
+      takeAnswerFor(update.message)
+        .flatMap(sendAnswer)
+        .map(verifyResponseStatus)
+        // increment offset
+        .map(_ => update.updateId + 1)
+    }).map(_.last)
   }
 
   /**
