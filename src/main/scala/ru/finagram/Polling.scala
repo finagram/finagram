@@ -8,14 +8,13 @@ import com.twitter.util._
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, JObject }
 import org.slf4j.Logger
-import ru.finagram.api._
+import ru.finagram.api.{ TelegramException, Update, Updates, Response => TelegramResponse }
 
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
  */
 trait Polling extends MessageReceiver {
   val token: String
-  def onError: PartialFunction[Throwable, Unit]
   val log: Logger
   /**
    * Asynchronous http client.
@@ -45,25 +44,19 @@ trait Polling extends MessageReceiver {
     Await result repeat(poll, 0L)
   }
 
+  def onError: PartialFunction[Throwable, Unit]
+
   /**
    * Invoked request, handle response with custom logic and send bot answer
    */
   private[finagram] def poll(offset: Long): Future[Long] = {
-    // TODO add support of some Updates
-    // invoke request
-    http(getUpdateRequest(offset)).map(verifyResponse)
-      // extract update
-      .map(extractUpdateFromResponse).flatMap {
-      case Some(update) =>
-        // invoke custom logic for handle update and take new offset
-        handleUpdateAndExtractNewOffset(update)
-      case None =>
-        // just use current offset again
-        Future(offset)
-    }.handle(
-      // if something was wrong we should try handle message again from current offset
-      onError.orElse(defaultErrorHandler).andThen(_ => offset)
-    )
+    http(getUpdateRequest(offset)).map(verifyResponseStatus)
+      .map(extractUpdatesFromResponse)
+      .flatMap(handleUpdatesAndExtractNewOffset)
+      .handle(
+        // if something was wrong we should try handle message again from current offset
+        onError.orElse(defaultErrorHandler).andThen(_ => offset)
+      )
   }
 
   /**
@@ -77,28 +70,37 @@ trait Polling extends MessageReceiver {
   }
 
   /**
-   * Extract if exist [[Update]] object from response content.
+   * Extract sequence of [[Update]] objects from response content.
    *
    * @param response response from Telegram after request updates.
-   * @return [[Update]] or [[None]]
+   * @return sequence of [[Update]] objects or None if updates is not exists.
+   * @throws TelegramException when response is not ok (field 'ok' is false).
+   * @throws UnexpectedResponseException when parsing of the response was failed.
    */
-  private def extractUpdateFromResponse(response: Response): Option[Update] = {
+  private def extractUpdatesFromResponse(response: Response): Seq[Update] = {
     val content = response.contentString
     log.debug(s"Received content: $content")
-    Update(content)
+    Try(TelegramResponse(content)) match {
+      case Return(Updates(result)) =>
+        result
+      case Return(e: TelegramException) =>
+        throw e
+      case Throw(e) =>
+        throw new UnexpectedResponseException("Parse response failed.", e)
+    }
   }
 
   /**
    * Take and increment update id by one, and if update contains message,
    * this method invoke custom handler this message.
    *
-   * @param update [[Update]] object from Telegram's response.
+   * @param updates sequence of the [[Update]] object from Telegram's response.
    * @return next offset.
    */
-  private def handleUpdateAndExtractNewOffset(update: Update): Future[Long] = {
+  private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Long] = {
     takeAnswerFor(update.message)
       .flatMap(sendAnswer)
-      .map(verifyResponse)
+      .map(verifyResponseStatus)
       // increment offset
       .map(_ => update.updateId + 1)
   }
@@ -173,20 +175,11 @@ trait Polling extends MessageReceiver {
    * </ul>
    * @param res http response from Telegram.
    * @return received response.
-   * @throws UnexpectedResponseException if response contains wrong status or illegal content.
+   * @throws UnexpectedResponseException if response contains wrong status.
    */
-  private def verifyResponse(res: Response): Response = {
+  private def verifyResponseStatus(res: Response): Response = {
     if (!(200 to 299).contains(res.statusCode)) {
       throw new UnexpectedResponseException("Unexpected response status " + res.status)
-    }
-    val content = res.contentString
-    log.trace(s"Verify response with content:\n$content")
-    parse(content) match {
-      case json: JObject =>
-        if (json.values.contains("ok") && !(json \ "ok").extract[Boolean]) {
-          throw new UnexpectedResponseException("Response is not OK")
-        }
-      case _ =>
     }
     res
   }
