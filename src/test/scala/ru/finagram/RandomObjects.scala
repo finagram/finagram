@@ -47,5 +47,9 @@ trait RandomObjects {
     chat: Chat = randomChat()
   ): TextMessage = TextMessage(id, user, date, chat, text)
 
+  def randomStickerMessage(
+
+  )
+
   private def date = System.currentTimeMillis()
 }

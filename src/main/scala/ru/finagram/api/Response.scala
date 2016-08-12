@@ -42,11 +42,7 @@ case class TelegramException(description: String, errorCode: Option[Int])
  * @param message   Update identifiers start from a certain positive number and increase sequentially.
  *                  New incoming message of any kind — text, photo, sticker, etc.
  */
-case class Update(updateId: Long, message: Option[Message]) {
-  def toJson: JValue = {
-
-  }
-}
+case class Update(updateId: Long, message: Option[Message])
 
 /**
  * Successful result that contains updates from Telegram.
@@ -55,17 +51,11 @@ case class Update(updateId: Long, message: Option[Message]) {
  */
 case class Updates(result: Seq[Update]) extends Response {
   val ok = true
-
-  def toJson: JValue = {
-
-  }
 }
 
 object Update {
 
-  def apply(update: JValue): Update = {
-
-  }
+  def apply(update: JValue): Update = ???
 }
 
 object Updates {
@@ -88,6 +78,6 @@ class UpdatesSerializer extends Serializer[Updates] {
   }
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
-    case updates: Updates => updates.toJson
+    case updates: Updates => ???
   }
 }
