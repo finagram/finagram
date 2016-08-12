@@ -2,7 +2,7 @@ package ru.finagram.api
 
 import ru.finagram.Spec
 
-class ResponseSpec extends Spec {
+class TelegramResponseSpec extends Spec {
 
   describe("parse correct response from Telegram") {
     it(s"should create instance of $Updates") {
@@ -12,9 +12,26 @@ class ResponseSpec extends Spec {
           |{
           |   "ok":true,
           |   "result":[
-          |      {
-          |         "update_id":217684880,
-          |         "message":{  }
+          |    {
+          |       "update_id":217684885,
+          |       "message":{
+          |          "message_id":82,
+          |          "from":{
+          |             "id":192047269,
+          |             "first_name":"Vladimir",
+          |             "last_name":"Popov",
+          |             "username":"dokwork_ru"
+          |          },
+          |          "chat":{
+          |             "id":192047269,
+          |             "first_name":"Vladimir",
+          |             "last_name":"Popov",
+          |             "username":"dokwork_ru",
+          |             "type":"private"
+          |          },
+          |          "date":1470854050,
+          |          "text":"first"
+          |       }
           |      },
           |      {
           |         "update_id":217684886,
@@ -42,13 +59,21 @@ class ResponseSpec extends Spec {
         """.stripMargin
 
       // when:
-      val updates = Response(content).asInstanceOf[Updates]
+      val updates = TelegramResponse(content).asInstanceOf[Updates]
 
       // then:
       updates.ok should be(true)
       updates.result should have size 2
-      updates.result.head should be(Update(217684880L, None))
-      updates.result.last.message should be(TextMessage(
+      updates.result.head.updateId should be(217684885)
+      updates.result.head.message.get should be(TextMessage(
+        messageId = 82,
+        from = Some(User(192047269, "Vladimir", Some("Popov"), Some("dokwork_ru"))),
+        date = 1470854050,
+        chat = Chat(192047269, "private", None, Some("Vladimir"), Some("Popov"), Some("dokwork_ru")),
+        text = "first"
+      ))
+      updates.result.last.updateId should be(217684886)
+      updates.result.last.message.get should be(TextMessage(
         messageId = 83,
         from = Some(User(192047269, "Vladimir", Some("Popov"), Some("dokwork_ru"))),
         date = 1470854071,
@@ -58,7 +83,7 @@ class ResponseSpec extends Spec {
     }
   }
   describe("parse response with error from Telegram") {
-    ignore(s"should create instance of $TelegramException") {
+    it(s"should create instance of $TelegramException") {
       // given:
       val content =
         """
@@ -70,7 +95,7 @@ class ResponseSpec extends Spec {
         """.stripMargin
 
       // when:
-      val error = Response(content).asInstanceOf[TelegramException]
+      val error = TelegramResponse(content).asInstanceOf[TelegramException]
 
       // then:
       error.ok should be(false)

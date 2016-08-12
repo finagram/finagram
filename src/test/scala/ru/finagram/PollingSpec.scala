@@ -7,7 +7,7 @@ import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
-import ru.finagram.api.{ Response => TelegramResponse }
+import ru.finagram.api.{ TelegramResponse$ => TelegramResponse }
 
 class PollingSpec extends Spec with RandomObjects {
 

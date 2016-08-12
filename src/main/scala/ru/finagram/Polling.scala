@@ -8,7 +8,7 @@ import com.twitter.util._
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
 import org.slf4j.Logger
-import ru.finagram.api.{ Answer, Message, StickerAnswer, TelegramException, TextAnswer, Update, Updates, Response => TelegramResponse }
+import ru.finagram.api.{ Answer, Message, StickerAnswer, TelegramException, TextAnswer, Update, Updates, TelegramResponse }
 
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
