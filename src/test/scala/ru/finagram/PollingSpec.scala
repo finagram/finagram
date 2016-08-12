@@ -7,6 +7,7 @@ import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
+import ru.finagram.api.{ Response => TelegramResponse }
 
 class PollingSpec extends Spec with RandomObjects {
 
@@ -23,11 +24,9 @@ class PollingSpec extends Spec with RandomObjects {
       val polling = new TestPolling(token, http, (_) => answer)
 
       // when:
-      val nextOffset = Await result polling.poll(offset)
+      Await result polling.poll(offset)
 
       // then:
-      nextOffset should be(updates.result.last.updateId + 1)
-
       val captor = argumentCaptor[Request]
       verify(http).apply(captor.capture())
       val request = captor.getValue
@@ -44,10 +43,11 @@ class PollingSpec extends Spec with RandomObjects {
       val polling = spy(new TestPolling(token, http, (_) => answer))
 
       // when:
-      Await result polling.poll(0)
+      val nextOffset = Await result polling.poll(0)
 
       // then:
       verify(polling, times(3)).handle(any[Message])
+      nextOffset should be(updates.result.last.updateId + 1)
     }
   }
 
@@ -58,13 +58,14 @@ class PollingSpec extends Spec with RandomObjects {
   ) extends Polling {
     override val log: Logger = PollingSpec.this.log
     override def handle(message: Message): Try[Answer] = {
+      log.info(s"$message")
       Try(answer(message))
     }
     override def onError: PartialFunction[Throwable, Unit] = { case e => throw e }
   }
 
   private def toJsonString(updates: Updates): String = {
-    implicit val formats = DefaultFormats + FieldSerializer[Response]()
+    implicit val formats = DefaultFormats + FieldSerializer[TelegramResponse]()
     val str = compact(render(Extraction.decompose(updates).snakizeKeys))
     str
   }

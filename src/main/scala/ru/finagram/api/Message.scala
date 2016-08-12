@@ -1,6 +1,6 @@
 package ru.finagram.api
 
-import org.json4s.DefaultFormats
+import org.json4s.{ DefaultFormats, Formats, JValue, Serializer, TypeInfo }
 import org.json4s.JsonAST.JObject
 
 /**
