@@ -163,7 +163,7 @@ trait Polling extends MessageReceiver {
         Request(Method.Post, s"/bot$token/sendMessage")
       case sticker: StickerAnswer =>
         Request(Method.Post, s"/bot$token/sendSticker")
-      case _ => ???
+      case a => throw new NotImplementedError(s"Not implemented post answer for $a")
     }
     request.setContentTypeJson()
     request.contentString = content

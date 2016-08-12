@@ -7,7 +7,7 @@ import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
-import ru.finagram.api.{ TelegramResponse$ => TelegramResponse }
+import ru.finagram.api.TelegramResponse
 
 class PollingSpec extends Spec with RandomObjects {
 
@@ -18,7 +18,7 @@ class PollingSpec extends Spec with RandomObjects {
       // given:
       val token = randomString()
       val offset = randomInt()
-      val answer = mock[Answer]
+      val answer = mock[FlatAnswer]
       val updates = randomUpdates(1)
       val http = clientWithResponse(responseWithContent(toJsonString(updates)))
       val polling = new TestPolling(token, http, (_) => answer)
@@ -28,8 +28,8 @@ class PollingSpec extends Spec with RandomObjects {
 
       // then:
       val captor = argumentCaptor[Request]
-      verify(http).apply(captor.capture())
-      val request = captor.getValue
+      verify(http, atLeastOnce()).apply(captor.capture())
+      val request = captor.getAllValues.get(0)
 
       request.path should be(s"/bot$token/getUpdates")
       request.params("offset") should be(offset.toString)
@@ -37,7 +37,7 @@ class PollingSpec extends Spec with RandomObjects {
     it("should invoke handler as many times as updates in the response") {
       // given:
       val token = randomString()
-      val answer = mock[Answer]
+      val answer = mock[FlatAnswer]
       val updates = randomUpdates(3)
       val http = clientWithResponse(responseWithContent(toJsonString(updates)))
       val polling = spy(new TestPolling(token, http, (_) => answer))
