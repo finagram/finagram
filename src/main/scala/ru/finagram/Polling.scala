@@ -53,6 +53,7 @@ trait Polling extends MessageReceiver {
     http(getUpdateRequest(offset)).map(verifyResponseStatus)
       .map(extractUpdatesFromResponse)
       .flatMap(handleUpdatesAndExtractNewOffset)
+      .map(_.getOrElse(offset))
       .handle(
         // if something was wrong we should try handle message again from current offset
         onError.orElse(defaultErrorHandler).andThen(_ => offset)
@@ -98,14 +99,14 @@ trait Polling extends MessageReceiver {
    * @param updates sequence of the [[Update]] object from Telegram's response.
    * @return next offset.
    */
-  private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Long] = {
+  private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Option[Long]] = {
     Future.collect(updates.map { update =>
       takeAnswerFor(update.message)
         .flatMap(sendAnswer)
         .map(verifyResponseStatus)
         // increment offset
         .map(_ => update.updateId + 1)
-    }).map(_.last)
+    }).map(_.lastOption)
   }
 
   /**

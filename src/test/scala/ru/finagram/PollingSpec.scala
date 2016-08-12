@@ -19,7 +19,7 @@ class PollingSpec extends Spec with RandomObjects {
       val token = randomString()
       val offset = randomInt()
       val answer = mock[FlatAnswer]
-      val updates = randomUpdates(1)
+      val updates = randomUpdates(0)
       val http = clientWithResponse(responseWithContent(toJsonString(updates)))
       val polling = new TestPolling(token, http, (_) => answer)
 
@@ -28,8 +28,8 @@ class PollingSpec extends Spec with RandomObjects {
 
       // then:
       val captor = argumentCaptor[Request]
-      verify(http, atLeastOnce()).apply(captor.capture())
-      val request = captor.getAllValues.get(0)
+      verify(http).apply(captor.capture())
+      val request = captor.getValue
 
       request.path should be(s"/bot$token/getUpdates")
       request.params("offset") should be(offset.toString)
