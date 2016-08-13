@@ -26,5 +26,21 @@ class FinagramBotSpec extends Spec {
       // then:
       answer should be(FlatAnswer(chat.id, "it's work!"))
     }
+    it("should invoke registered handler without arguments") {
+      // given:
+      val chat = Chat(12L, Random.nextString(12))
+      val bot = new AnyRef() with TestBot {
+        on("/command") {
+          text("it's work!")
+        }
+      }
+      Seq(" ", "\t", "\n").foreach {space =>
+        // when:
+        val answer = bot.handle(TextMessage(1L, None, 1L, chat, s"/command${space}some another text")).get()
+
+        // then:
+        answer should be(FlatAnswer(chat.id, "it's work!"))
+      }
+    }
   }
 }

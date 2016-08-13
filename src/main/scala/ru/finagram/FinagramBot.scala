@@ -57,9 +57,9 @@ trait FinagramBot {
   override final def handle(message: Message): Try[Answer] = {
     message match {
       // invoke handler for text message
-      case TextMessage(_, _, _, _, text) if handlers.contains(text) =>
+      case msg: TextMessage if handlers.contains(msg.command) =>
         log.debug(s"Invoke handler for message $message")
-        Try(handlers(text)(message))
+        Try(handlers(msg.command)(message))
       // TODO add support of other message types
       case _ =>
         Throw(new NotHandledMessageException("Received not handled message: " + message))

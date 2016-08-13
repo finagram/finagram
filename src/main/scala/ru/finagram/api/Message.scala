@@ -85,7 +85,17 @@ case class Sticker(fileId: String, width: Int, height: Int, thumb: Option[PhotoS
  * @param chat 	    Conversation the message belongs to.
  * @param text      The actual UTF-8 text of the message, 0-4096 characters.
  */
-case class TextMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, text: String) extends Message
+case class TextMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, text: String) extends Message {
+  /**
+   * Return substring that contains only command.
+   * Command should begin from '/' and end with space symbol or end of the string.
+   *
+   * @return substring that contains only command.
+   */
+  def command: String = {
+    text.replaceFirst("\\s.*", "")
+  }
+}
 
 /**
  * Sticker.
