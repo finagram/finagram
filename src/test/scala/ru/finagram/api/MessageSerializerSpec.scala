@@ -59,6 +59,7 @@ class MessageSerializerSpec extends Spec with RandomObjects {
         JField("message_id", JInt(_)),
         JField("chat", JObject(_)),
         JField("date", JInt(_)),
+        JField("from", JObject(_)),
         JField("sticker", JObject(_))
         )) =>
         case _ => throw new Exception(s"Wrong json:\n$json")

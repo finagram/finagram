@@ -16,6 +16,7 @@ class PollingSpec extends Spec with RandomObjects {
       val updates = randomUpdates(3)
       val client = mock[TelegramClient]
       doReturn(Future(updates.result)).when(client).getUpdates(any[String], any[Long], any[Option[Int]])
+      doReturn(Future.Unit).when(client).sendAnswer(any[String], any[Answer])
       val polling = spy(new TestPolling(token, client, (_) => answer))
 
       // when:

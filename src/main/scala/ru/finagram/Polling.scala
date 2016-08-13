@@ -60,7 +60,12 @@ trait Polling extends MessageReceiver {
   private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Option[Long]] = {
     Future.collect(updates.map { update =>
       takeAnswerFor(update.message)
-        .flatMap(answer => client.sendAnswer(token, answer))
+        .flatMap {
+          case Some(answer) =>
+            client.sendAnswer(token, answer)
+          case None =>
+            Future.Done
+        }
         // increment offset
         .map(_ => update.updateId + 1)
     }).map(_.lastOption)

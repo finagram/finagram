@@ -1,10 +1,10 @@
 package ru.finagram.api
 
+import com.twitter.finagle.http.{ Method, Request, Response }
 import com.twitter.finagle.{ Http, Service }
-import com.twitter.finagle.http.{ Method, Request, Response, Status }
 import com.twitter.util.{ Future, Return, Throw, Try }
-import org.json4s.{ DefaultFormats, Extraction }
 import org.json4s.native.JsonMethods._
+import org.json4s.{ DefaultFormats, Extraction }
 import org.slf4j.LoggerFactory
 import ru.finagram.UnexpectedResponseException
 
@@ -77,18 +77,16 @@ class TelegramClient private[finagram] (http: Service[Request, Response]) {
   }
 
   /**
-   * Send bot answer as POST request if answer is defined otherwise just return 200 response.
+   * Send bot answer as POST request.
    *
    * @param token
-   * @param opt custom bot answer to message or [[None]].
-   * @return http response.
+   * @param answer custom bot answer to message.
    */
-  def sendAnswer(token: String, opt: Option[Answer]): Future[Response] = opt match {
-    case Some(answer) =>
-      http(postAnswer(token, answer))
-        .onSuccess(response => log.debug("Response to answer:\n" + response.contentString))
-    case None =>
-      Future(Response(Status.Ok))
+  def sendAnswer(token: String, answer: Answer): Future[Unit] = {
+    http(postAnswer(token, answer))
+      .onSuccess(response => log.debug("Response to answer:\n" + response.contentString))
+      .map(verifyResponseStatus)
+      .map(_ => Unit)
   }
 
   /**
