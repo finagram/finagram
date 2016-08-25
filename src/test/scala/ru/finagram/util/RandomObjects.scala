@@ -1,9 +1,9 @@
-package ru.finagram
+package ru.finagram.util
 
 import ru.finagram.api._
 
-import scala.util.Random
 import scala.math.abs
+import scala.util.Random
 
 /**
  * Generate random instances of objects from Telegram api.

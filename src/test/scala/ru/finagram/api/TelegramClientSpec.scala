@@ -5,7 +5,8 @@ import com.twitter.util.Await
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
-import ru.finagram.{ RandomObjects, Spec }
+import ru.finagram.RandomObjects
+import ru.finagram.util.{ RandomObjects, Spec }
 
 class TelegramClientSpec extends Spec with RandomObjects {
 

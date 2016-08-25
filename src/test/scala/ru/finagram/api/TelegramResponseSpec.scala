@@ -1,6 +1,6 @@
 package ru.finagram.api
 
-import ru.finagram.Spec
+import ru.finagram.util.Spec
 
 class TelegramResponseSpec extends Spec {
 

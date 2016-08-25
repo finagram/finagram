@@ -3,6 +3,7 @@ import com.twitter.util.{ Await, Future, Try }
 import org.mockito.Mockito._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
+import ru.finagram.util.{ RandomObjects, Spec }
 
 class PollingSpec extends Spec with RandomObjects {
 

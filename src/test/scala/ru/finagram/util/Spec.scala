@@ -1,6 +1,4 @@
-package ru.finagram
-
-import java.util.UUID
+package ru.finagram.util
 
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{ Request, Response }

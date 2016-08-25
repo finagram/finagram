@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit
 
 import com.twitter.finagle.http.{ Message => _ }
 import com.twitter.util._
-import org.json4s.DefaultFormats
 import org.slf4j.Logger
 import ru.finagram.api._
 

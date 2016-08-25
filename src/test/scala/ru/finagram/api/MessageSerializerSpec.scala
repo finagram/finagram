@@ -2,7 +2,8 @@ package ru.finagram.api
 
 import org.json4s.JsonAST._
 import org.json4s.{ DefaultFormats, Extraction }
-import ru.finagram.{ RandomObjects, Spec }
+import ru.finagram.RandomObjects
+import ru.finagram.util.{ RandomObjects, Spec }
 
 class MessageSerializerSpec extends Spec with RandomObjects {
 

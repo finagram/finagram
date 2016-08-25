@@ -8,6 +8,9 @@ import org.json4s.{ DefaultFormats, Extraction }
 import org.slf4j.LoggerFactory
 import ru.finagram.UnexpectedResponseException
 
+/**
+ * Contains methods for issue http requests to Telegram.
+ */
 class TelegramClient private[finagram] (http: Service[Request, Response]) {
 
   private val log = LoggerFactory.getLogger(getClass)

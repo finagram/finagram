@@ -1,6 +1,7 @@
 package ru.finagram
 
 import ru.finagram.api.{ Answers, Chat, FlatAnswer, TextMessage }
+import ru.finagram.util.Spec
 
 import scala.util.Random
 
