@@ -1,13 +1,14 @@
 package ru.finagram
 
-import ru.finagram.api.{ Answers, Chat, FlatAnswer, TextMessage }
+import ru.finagram.api.{ Chat, FlatAnswer, TextMessage }
 import ru.finagram.util.Spec
+import ru.finagram.Answers._
 
 import scala.util.Random
 
 class FinagramBotSpec extends Spec {
 
-  trait TestBot extends FinagramBot with MessageReceiver with Answers {
+  trait TestBot extends FinagramBot with MessageReceiver {
     override val token: String = "123-123-123"
     override def run(): Unit = ???
   }

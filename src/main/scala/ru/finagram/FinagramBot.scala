@@ -54,6 +54,7 @@ trait FinagramBot {
    * @param message Message from Telegram.
    * @return answer.
    */
+  // FIXME user should have way to skip message
   override final def handle(message: Message): Try[Answer] = {
     message match {
       // invoke handler for text message

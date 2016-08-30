@@ -1,3 +1,3 @@
 package ru.finagram
 
-class NotHandledMessageException(msg: String) extends Exception(msg)
+case class NotHandledMessageException(msg: String) extends Exception(msg)

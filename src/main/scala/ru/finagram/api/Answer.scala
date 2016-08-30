@@ -22,7 +22,42 @@ sealed trait Answer {
    * If the message is a reply, ID of the original message
    */
   val replyToMessageId: Option[Long]
+
+  /**
+   * A custom keyboard with reply options.
+   */
+  val replyMarkup: Option[ReplyKeyboardMarkup]
 }
+
+/**
+ * This object represents one button of the reply keyboard.
+ *
+ * @param text 	          Text of the button. If none of the optional fields are used,
+ *                        it will be sent to the bot as a message when the button is pressed.
+ * @param requestContact  If True, the user's phone number will be sent as a contact
+ *                        when the button is pressed. Available in private chats only.
+ * @param requestLocation If True, the user's current location will be sent when the button is pressed.
+ *                        Available in private chats only.
+ */
+case class KeyboardButton(
+  text: String,
+  requestContact: Option[Boolean] = None,
+  requestLocation: Option[Boolean] = None)
+
+/**
+ * This object represents a custom keyboard with reply options.
+ *
+ * @param keyboard Array of button rows, each represented by an Array of [[KeyboardButton]] objects.
+ * @param resizeKeyboard Requests clients to resize the keyboard vertically for optimal fit.
+ * @param oneTimeKeyboard Requests clients to hide the keyboard as soon as it's been used.
+ * @param selective Use this parameter if you want to show the keyboard to specific users only.
+ */
+case class ReplyKeyboardMarkup(
+  keyboard: Seq[Seq[KeyboardButton]],
+  resizeKeyboard: Option[Boolean] = None,
+  oneTimeKeyboard: Option[Boolean] = None,
+  selective: Option[Boolean] = None
+)
 
 trait TextAnswer extends Answer {
   /**
@@ -39,8 +74,9 @@ trait TextAnswer extends Answer {
 /**
  * Simple text answer without formatting.
  *
- * @param chatId identifier for the target chat or username of the target channel (in the format @channelusername)
+ * @param chatId Identifier for the target chat or username of the target channel (in the format @channelusername)
  * @param text Text of the message to be sent
+ * @param replyMarkup A custom keyboard with reply options.
  * @param disableWebPagePreview Disables link previews for links in this message
  * @param disableNotification Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
  * @param replyToMessageId If the message is a reply, ID of the original message
@@ -48,6 +84,7 @@ trait TextAnswer extends Answer {
 case class FlatAnswer(
   chatId: Long,
   text: String,
+  replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None) extends TextAnswer
@@ -58,6 +95,7 @@ case class FlatAnswer(
 case class MarkdownAnswer(
   chatId: Long,
   text: String,
+  replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None,
@@ -69,6 +107,7 @@ case class MarkdownAnswer(
 case class HtmlAnswer(
   chatId: Long,
   text: String,
+  replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None,
@@ -84,6 +123,7 @@ case class PhotoAnswer(
   chatId: Long,
   photo: String, // TODO: add InputFile support
   caption: Option[String],
+  replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None
 ) extends Answer
@@ -97,6 +137,7 @@ case class PhotoAnswer(
 case class StickerAnswer(
   chatId: Long,
   sticker: String, // TODO: add InputFile support
+  replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None
 ) extends Answer

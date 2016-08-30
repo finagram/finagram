@@ -1,9 +1,10 @@
 package ru.finagram.api
 
 import com.typesafe.config.ConfigFactory
-import ru.finagram.{ FinagramBot, Polling }
+import ru.finagram.{ FinagramBot, Keyboard, NotHandledMessageException, Polling }
+import ru.finagram.Answers._
 
-object FinagramExampleBot extends App with FinagramBot with Polling with Answers {
+object FinagramExampleBot extends App with FinagramBot with Polling {
   override val token: String = ConfigFactory.load("example.conf").getString("token")
 
   on("/text") {
@@ -22,7 +23,23 @@ object FinagramExampleBot extends App with FinagramBot with Polling with Answers
     sticker("BQADBAADtgQAAjZHEwABA70wjTd86fIC")
   }
 
+  on("/keyboard") {
+    val keyboard = new Keyboard()
+      .buttons("1", "2", "3")
+      .buttons("4", "5", "6")
+      .create()
+    text("Keyboard", Some(keyboard))
+  }
+
   run()
+
+  override /**
+   * Handle any errors.
+   */
+  def onError: PartialFunction[Throwable, Unit] = {
+    case NotHandledMessageException(msg) =>
+      log.warn(msg)
+  }
 
   /**
    * Handle any errors.
