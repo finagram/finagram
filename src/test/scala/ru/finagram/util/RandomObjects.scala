@@ -8,7 +8,7 @@ import scala.util.Random
 /**
  * Generate random instances of objects from Telegram api.
  */
-trait RandomObjects {
+object RandomObjects {
 
   def randomString() = Random.nextString(12)
 

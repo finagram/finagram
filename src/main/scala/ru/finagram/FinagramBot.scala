@@ -52,18 +52,22 @@ trait FinagramBot {
    * Create answer for message.
    *
    * @param message Message from Telegram.
-   * @return answer.
+   * @return answer if handler for message was found or [[None]].
    */
   // FIXME user should have way to skip message
-  override final def handle(message: Message): Try[Answer] = {
+  override final def handle(message: Message): Option[Try[Answer]] = {
     message match {
       // invoke handler for text message
-      case msg: TextMessage if handlers.contains(msg.command) =>
-        log.debug(s"Invoke handler for message $message")
-        Try(handlers(msg.command)(message))
+      case msg: TextMessage =>
+        if (handlers.contains(msg.command)) {
+          log.debug(s"Invoke handler for message $message")
+          Some(Try(handlers(msg.command)(message)))
+        } else {
+          None
+        }
       // TODO add support of other message types
       case _ =>
-        Throw(new NotHandledMessageException("Received not handled message: " + message))
+        throw new NotHandledMessageException("Received not handled message: " + message)
     }
   }
 }

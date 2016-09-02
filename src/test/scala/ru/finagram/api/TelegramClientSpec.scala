@@ -5,9 +5,10 @@ import com.twitter.util.Await
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
-import ru.finagram.util.{ RandomObjects, Spec }
+import ru.finagram.util.RandomObjects._
+import ru.finagram.util.Spec
 
-class TelegramClientSpec extends Spec with RandomObjects {
+class TelegramClientSpec extends Spec {
 
   describe("get updates") {
     it("should issue GET to /bot<token>/getUpdates with offset and limit") {

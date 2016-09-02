@@ -3,9 +3,10 @@ import com.twitter.util.{ Await, Future, Try }
 import org.mockito.Mockito._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
-import ru.finagram.util.{ RandomObjects, Spec }
+import ru.finagram.util.Spec
+import ru.finagram.util.RandomObjects._
 
-class PollingSpec extends Spec with RandomObjects {
+class PollingSpec extends Spec {
 
   private val log = LoggerFactory.getLogger(getClass)
 
@@ -35,10 +36,10 @@ class PollingSpec extends Spec with RandomObjects {
     answer: (Message) => Answer
   ) extends Polling {
     override val log: Logger = PollingSpec.this.log
-    override def handle(message: Message): Try[Answer] = {
+    override def handle(message: Message): Option[Try[Answer]] = {
       log.info(s"$message")
-      Try(answer(message))
+      Some(Try(answer(message)))
     }
-    override def onError: PartialFunction[Throwable, Unit] = { case e => throw e }
+    override def handleError: PartialFunction[Throwable, Unit] = { case e => throw e }
   }
 }

@@ -5,6 +5,7 @@ import ru.finagram.util.Spec
 import ru.finagram.Answers._
 
 import scala.util.Random
+import ru.finagram.util.RandomObjects._
 
 class FinagramBotSpec extends Spec {
 
@@ -17,7 +18,7 @@ class FinagramBotSpec extends Spec {
     it("should invoke registered handler") {
       // given:
       val chat = Chat(12L, Random.nextString(12))
-      val bot = new AnyRef() with TestBot {
+      val bot = new AnyRef with TestBot {
         on("/command") {
           text("it's work!")
         }
@@ -31,7 +32,7 @@ class FinagramBotSpec extends Spec {
     it("should invoke registered handler without arguments") {
       // given:
       val chat = Chat(12L, Random.nextString(12))
-      val bot = new AnyRef() with TestBot {
+      val bot = new AnyRef with TestBot {
         on("/command") {
           text("it's work!")
         }
@@ -43,6 +44,14 @@ class FinagramBotSpec extends Spec {
         // then:
         answer should be(FlatAnswer(chat.id, "it's work!"))
       }
+    }
+    it("should not throw exception if handler for message was not found") {
+      // given:
+      val bot = new AnyRef with TestBot
+      // when:
+      val result = bot.handle(randomTextMessage())
+      // then exception not expected:
+      result should be(None)
     }
   }
 }

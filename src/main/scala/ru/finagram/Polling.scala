@@ -22,7 +22,7 @@ trait Polling extends MessageReceiver {
    * Default error handler
    */
   private val defaultErrorHandler: PartialFunction[Throwable, Unit] = {
-    case e => log.warn("Not handled exception", e)
+    case e => log.error("Not handled exception", e)
   }
 
   private[finagram] val client = TelegramClient()
@@ -34,7 +34,7 @@ trait Polling extends MessageReceiver {
     Await result repeat(poll, 0L)
   }
 
-  def onError: PartialFunction[Throwable, Unit]
+  def handleError: PartialFunction[Throwable, Unit]
 
   /**
    * Invoked request, handle response with custom logic and send bot answer
@@ -45,29 +45,36 @@ trait Polling extends MessageReceiver {
       .map(_.getOrElse(offset))
       .handle(
         // if something was wrong we should try handle message again from current offset
-        onError.orElse(defaultErrorHandler).andThen(_ => offset)
+        handleError.orElse(defaultErrorHandler).andThen(_ => offset)
       )
   }
 
   /**
    * Take and increment update id by one, and if update contains message,
-   * this method invoke custom handler this message.
+   * this method invoke custom handler for this message.
    *
    * @param updates sequence of the [[Update]] object from Telegram's response.
    * @return next offset.
    */
   private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Option[Long]] = {
     Future.collect(updates.map { update =>
-      takeAnswerFor(update.message)
-        .flatMap {
-          case Some(answer) =>
-            client.sendAnswer(token, answer)
-          case None =>
-            Future.Done
-        }
-        // increment offset
-        .map(_ => update.updateId + 1)
+      handleUpdate(update).map(_ => update.updateId + 1)
     }).map(_.lastOption)
+  }
+
+  private def handleUpdate(update: Update): Future[Unit] = {
+    update.message match {
+      case Some(message) =>
+        takeAnswerFor(message)
+          .flatMap {
+            case Some(answer) =>
+              client.sendAnswer(token, answer)
+            case None =>
+              Future.Done
+          }
+      case None =>
+        Future.Done
+    }
   }
 
   /**
@@ -77,23 +84,12 @@ trait Polling extends MessageReceiver {
    * @param message message from Telegram's response.
    * @return custom bot answer to message or [[None]].
    */
-  private def takeAnswerFor(message: Option[Message]): Future[Option[Answer]] = {
-    message match {
-      case Some(msg) =>
-        Future(handle(msg) match {
-          case Return(answer) =>
-            Some(answer)
-          case Throw(e) =>
-            log.error(s"Exception on handle message $message", e)
-            None
-        })
-      case None =>
-        log.debug("Message is empty")
-        Future.None
-      case _ =>
-        log.debug("Received not handled message: " + message)
-        Future.None
-    }
+  private def takeAnswerFor(message: Message): Future[Option[Answer]] = {
+    Future(
+      handle(message).flatMap(tryAnswer =>
+        tryAnswer.onFailure(handleError.orElse(defaultErrorHandler)).toOption
+      )
+    )
   }
 
   /**

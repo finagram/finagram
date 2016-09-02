@@ -12,7 +12,7 @@ trait MessageReceiver extends Runnable {
    * Create answer for message.
    *
    * @param message Message from Telegram.
-   * @return answer or None.
+   * @return answer or [[None]].
    */
-  def handle(message: Message): Try[Answer]
+  def handle(message: Message): Option[Try[Answer]]
 }

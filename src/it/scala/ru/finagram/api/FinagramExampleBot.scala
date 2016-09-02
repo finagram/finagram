@@ -36,7 +36,7 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
   override /**
    * Handle any errors.
    */
-  def onError: PartialFunction[Throwable, Unit] = {
+  def handleError: PartialFunction[Throwable, Unit] = {
     case NotHandledMessageException(msg) =>
       log.warn(msg)
   }
