@@ -22,7 +22,7 @@ trait Polling extends MessageReceiver {
    * Default error handler
    */
   private val defaultErrorHandler: PartialFunction[Throwable, Unit] = {
-    case e => log.error("Not handled exception", e)
+    case e => log.error("Not handled exception:", e)
   }
 
   private[finagram] val client = TelegramClient()
@@ -78,18 +78,16 @@ trait Polling extends MessageReceiver {
   }
 
   /**
-   * Invoke handler for message and return answer from it. If handler will not found, then None
+   * Invoke handler for message and return answer from it. If handler will not found,
+   * or exception will threw then return [[None]].
    * will returned.
    *
    * @param message message from Telegram's response.
    * @return custom bot answer to message or [[None]].
    */
   private def takeAnswerFor(message: Message): Future[Option[Answer]] = {
-    Future(
-      handle(message).flatMap(tryAnswer =>
-        tryAnswer.onFailure(handleError.orElse(defaultErrorHandler)).toOption
-      )
-    )
+    Future(handle(message))
+      .handle(handleError.orElse(defaultErrorHandler).andThen(_ => None))
   }
 
   /**

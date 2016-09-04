@@ -1,7 +1,6 @@
 package ru.finagram
 
 import com.twitter.finagle.http.{ Message => _ }
-import com.twitter.util.{ Throw, Try }
 import org.slf4j.LoggerFactory
 import ru.finagram.api._
 
@@ -55,13 +54,13 @@ trait FinagramBot {
    * @return answer if handler for message was found or [[None]].
    */
   // FIXME user should have way to skip message
-  override final def handle(message: Message): Option[Try[Answer]] = {
+  override final def handle(message: Message): Option[Answer] = {
     message match {
       // invoke handler for text message
       case msg: TextMessage =>
         if (handlers.contains(msg.command)) {
           log.debug(s"Invoke handler for message $message")
-          Some(Try(handlers(msg.command)(message)))
+          Some(handlers(msg.command)(message))
         } else {
           None
         }

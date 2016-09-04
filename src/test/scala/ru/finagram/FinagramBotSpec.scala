@@ -24,10 +24,10 @@ class FinagramBotSpec extends Spec {
         }
       }
       // when:
-      val answer = bot.handle(TextMessage(1L, None, 1L, chat, "/command")).get()
+      val answer = bot.handle(TextMessage(1L, None, 1L, chat, "/command"))
 
       // then:
-      answer should be(FlatAnswer(chat.id, "it's work!"))
+      answer should contain (FlatAnswer(chat.id, "it's work!"))
     }
     it("should invoke registered handler without arguments") {
       // given:
@@ -39,10 +39,10 @@ class FinagramBotSpec extends Spec {
       }
       Seq(" ", "\t", "\n").foreach {space =>
         // when:
-        val answer = bot.handle(TextMessage(1L, None, 1L, chat, s"/command${space}some another text")).get()
+        val answer = bot.handle(TextMessage(1L, None, 1L, chat, s"/command${space}some another text"))
 
         // then:
-        answer should be(FlatAnswer(chat.id, "it's work!"))
+        answer should contain (FlatAnswer(chat.id, "it's work!"))
       }
     }
     it("should not throw exception if handler for message was not found") {
