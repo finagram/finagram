@@ -1,13 +1,13 @@
 import sbt.Keys._
 
-lazy val finagram = (project in file("."))
+lazy val finagram = (project in file("finagram"))
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
     Seq(
-      name := "Finagram",
+      name := "finagram",
       version := "0.0.1",
-      organization := "ru.dokwork",
+      organization := "ru.finagram",
       scalaVersion := "2.11.8",
       libraryDependencies ++= Seq(
         "org.slf4j"       %   "slf4j-api"     % "1.7.21",
@@ -20,3 +20,19 @@ lazy val finagram = (project in file("."))
       )
     )
   )
+
+lazy val tutorial = (project in file("tutorial_bot"))
+  .settings(
+    Seq(
+      name := "tutorial",
+      version := "0.0.1",
+      organization := "ru.finagram",
+      scalaVersion := "2.11.8",
+      libraryDependencies ++= Seq(
+        "org.slf4j"       %   "slf4j-api"     % "1.7.21",
+        "ch.qos.logback"  % "logback-classic" % "1.1.7",
+        "com.typesafe"    %   "config"        % "1.3.0"
+      )
+    )
+  )
+  .dependsOn(finagram)

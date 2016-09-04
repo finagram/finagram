@@ -9,6 +9,8 @@ import scala.collection.mutable
  */
 class Keyboard {
 
+  // TODO new Keyboard(resize, oneTime)
+
   private val keyboards = mutable.Buffer[Seq[KeyboardButton]]()
   private var resizeKeyboard: Option[Boolean] = None
   private var oneTimeKeyboard: Option[Boolean] = None
@@ -19,27 +21,30 @@ class Keyboard {
     this
   }
 
+  // TODO:
 //  def buttons(row: KeyboardButton*): Keyboard = {
 //    keyboards += row
 //    this
 //  }
 
-  def resize(arg: Boolean): Keyboard = {
-    resizeKeyboard = Some(arg)
+  def resize(): Keyboard = {
+    resizeKeyboard = Some(true)
     this
   }
 
-  def oneTime(arg: Boolean): Keyboard = {
-    oneTimeKeyboard = Some(arg)
+  def oneTime(): Keyboard = {
+    oneTimeKeyboard = Some(true)
     this
   }
 
-  def selective(arg: Boolean): Keyboard = {
-    isSelective = Some(arg)
+  def selective(): Keyboard = {
+    isSelective = Some(true)
     this
   }
 
   def create(): ReplyKeyboardMarkup = {
-    ReplyKeyboardMarkup(keyboards.toSeq, resizeKeyboard, oneTimeKeyboard, isSelective)
+    ReplyKeyboardMarkup(keyboards.map(btn => btn), resizeKeyboard, oneTimeKeyboard, isSelective)
   }
+
+  def createOpt(): Option[ReplyKeyboardMarkup] = Some(create())
 }

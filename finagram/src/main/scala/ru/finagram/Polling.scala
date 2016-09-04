@@ -18,6 +18,7 @@ trait Polling extends MessageReceiver {
    * Timer for repeat [[poll]]
    */
   private val timer = new JavaTimer(true)
+
   /**
    * Default error handler
    */
@@ -34,7 +35,7 @@ trait Polling extends MessageReceiver {
     Await result repeat(poll, 0L)
   }
 
-  def handleError: PartialFunction[Throwable, Unit]
+  def handleError: PartialFunction[Throwable, Unit] = defaultErrorHandler
 
   /**
    * Invoked request, handle response with custom logic and send bot answer
