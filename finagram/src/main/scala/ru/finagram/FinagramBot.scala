@@ -9,43 +9,19 @@ import scala.collection.mutable
 /**
  * Trait for implementation of the bot logic.
  */
-trait FinagramBot {
+trait FinagramBot extends FinagramHandler {
 
   this: MessageReceiver =>
 
   // Logic for handle messages from user
   val log = LoggerFactory.getLogger(getClass)
 
-  private val handlers = mutable.Map[String, (Message) => Answer]()
-
   /**
    * Token of the bot.
    */
   val token: String
 
-  /**
-   * Handle any errors.
-   */
-  def onError: PartialFunction[Throwable, Unit] = {
-    case e => log.error("Something wrong", e)
-  }
-
-  /**
-   * Add handle for specified text from user.
-   * Every text should contain only one handle otherwise [[IllegalArgumentException]] will be thrown.
-   *
-   * @param text Text from user. Cannot be empty.
-   * @param handler Logic for create answer for received text.
-   */
-  final def on(text: String)(handler: (Message) => Answer): Unit = {
-    if (text.trim.isEmpty) {
-      throw new IllegalArgumentException("Text cannot be empty")
-    }
-    if (handlers.contains(text)) {
-      throw new IllegalArgumentException(s"Handler for command $text already registered.")
-    }
-    handlers(text) = handler
-  }
+  override private[finagram] val handlers = mutable.Map[String, (Message) => Answer]()
 
   /**
    * Create answer for message.
@@ -53,7 +29,6 @@ trait FinagramBot {
    * @param message Message from Telegram.
    * @return answer if handler for message was found or [[None]].
    */
-  // FIXME user should have way to skip message
   override final def handle(message: Message): Option[Answer] = {
     message match {
       // invoke handler for text message
@@ -68,6 +43,13 @@ trait FinagramBot {
       case _ =>
         throw new NotHandledMessageException("Received not handled message: " + message)
     }
+  }
+
+  /**
+   * Handle any errors.
+   */
+  def onError: PartialFunction[Throwable, Unit] = {
+    case e => log.error("Something wrong", e)
   }
 }
 
