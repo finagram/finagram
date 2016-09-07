@@ -87,7 +87,7 @@ trait Polling extends MessageReceiver {
    * @return custom bot answer to message or [[None]].
    */
   private def takeAnswerFor(message: Message): Future[Option[Answer]] = {
-    Future(handle(message))
+    FuturePool.unboundedPool(handle(message))
       .handle(handleError.orElse(defaultErrorHandler).andThen(_ => None))
   }
 

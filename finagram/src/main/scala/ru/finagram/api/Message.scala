@@ -13,18 +13,6 @@ sealed trait Message {
   val date: Long
 }
 
-object Message {
-  implicit val formats = DefaultFormats
-
-  def apply(json: JObject): Message = {
-    json.values match {
-      case v if v.contains("text") => json.extract[TextMessage]
-      case v if v.contains("sticker") => json.extract[StickerMessage]
-      case _ => ???
-    }
-  }
-}
-
 /**
  * This class represents a Telegram user or bot.
  *

@@ -20,6 +20,14 @@ class TelegramClient private[finagram] (http: Service[Request, Response]) {
    */
   private implicit val formats = DefaultFormats
 
+  /**
+   * Issue Http GET request to Telegram with offset and limit as query parameters.
+   *
+   * @param token
+   * @param offset
+   * @param limit
+   * @return
+   */
   def getUpdates(token: String, offset: Long, limit: Option[Int] = None): Future[Seq[Update]] = {
     http(getUpdateRequest(token, offset, limit))
       .map(verifyResponseStatus)
@@ -27,7 +35,15 @@ class TelegramClient private[finagram] (http: Service[Request, Response]) {
   }
 
   /**
-   * Create request to Telegram for get one update from offset.
+   * Close the resource.
+   * The returned Future is completed when the resource has been fully relinquished.
+   */
+  def close(): Future[Unit] = {
+    http.close()
+  }
+
+  /**
+   * Create request to Telegram for get updates from offset.
    *
    * @param offset number of the last handled update.
    * @return http request
