@@ -1,7 +1,7 @@
 # finagram
 Bot for Telegram on Finagle
 
-## DoD for first alpha release
+## DoD for first alpha version
 * [x] Implement support of the polling
 * [ ] Implement support of the webhook
 * Implement support for send messages of types:
