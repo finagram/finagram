@@ -21,4 +21,4 @@ Bot for Telegram on Finagle
   * [ ] File
   * [ ] Photo
   * [ ] Sticker
-* Select and add license  
+* [ ] Select and add license  
