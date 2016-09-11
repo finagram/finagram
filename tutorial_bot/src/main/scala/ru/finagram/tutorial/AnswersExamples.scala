@@ -1,8 +1,9 @@
 package ru.finagram.tutorial
 
 import ru.finagram.Answers._
-import ru.finagram.Keyboard.{ oneTime, resize }
-import ru.finagram.{ FinagramHandler, Keyboard }
+import ru.finagram.api.Keyboard.{ oneTime, resize }
+import ru.finagram.FinagramHandler
+import ru.finagram.api.Keyboard
 
 trait AnswersExamples extends FinagramHandler {
   on("/answer") {

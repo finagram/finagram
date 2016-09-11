@@ -1,10 +1,8 @@
-package ru.finagram
-
-import ru.finagram.api.{ KeyboardButton, ReplyKeyboardMarkup }
+package ru.finagram.api
 
 import scala.collection.mutable
 
-import ru.finagram.Keyboard._
+import ru.finagram.api.Keyboard._
 
 /**
  * Simple builder for [[ru.finagram.api.ReplyKeyboardMarkup]].
@@ -42,7 +40,7 @@ class Keyboard(parameters: Parameter*) {
 object Keyboard {
 
   sealed trait Parameter {
-    private[finagram] val mask: Int
+    private[api] val mask: Int
 
     def containedIn(m: Int): Boolean = {
       if (mask.&(m) > 0) true else false
@@ -50,14 +48,14 @@ object Keyboard {
   }
 
   object resize extends Parameter {
-    private[finagram] val mask = 0x1
+    private[api] val mask = 0x1
   }
 
   object oneTime extends Parameter {
-    private[finagram] val mask = 0x2
+    private[api] val mask = 0x2
   }
 
   object selective extends Parameter {
-    private[finagram] val mask = 0x4
+    private[api] val mask = 0x4
   }
 }

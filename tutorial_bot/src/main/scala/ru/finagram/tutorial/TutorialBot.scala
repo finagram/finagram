@@ -1,8 +1,8 @@
 package ru.finagram.tutorial
 
-import ru.finagram.{ FinagramBot, Keyboard, Polling }
+import ru.finagram.{ FinagramBot, Polling }
 import ru.finagram.Answers._
-import ru.finagram.Keyboard.{ oneTime, resize }
+import ru.finagram.api.Keyboard.{ oneTime, resize }
 import ru.finagram.api.{ Answer, Message, TextMessage }
 
 object TutorialBot extends App with FinagramBot with TextAnswerExamples with Polling {

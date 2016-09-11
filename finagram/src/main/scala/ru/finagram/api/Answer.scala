@@ -1,7 +1,5 @@
 package ru.finagram.api
 
-// TODO add support for reply_markup
-
 /**
  * Trait that represents answers from Bot to user.
  */
@@ -26,23 +24,10 @@ sealed trait Answer {
   /**
    * A custom keyboard with reply options.
    */
-  val replyMarkup: Option[ReplyKeyboardMarkup]
+  val replyMarkup: Option[KeyboardMarkup]
 }
 
-/**
- * This object represents one button of the reply keyboard.
- *
- * @param text 	          Text of the button. If none of the optional fields are used,
- *                        it will be sent to the bot as a message when the button is pressed.
- * @param requestContact  If True, the user's phone number will be sent as a contact
- *                        when the button is pressed. Available in private chats only.
- * @param requestLocation If True, the user's current location will be sent when the button is pressed.
- *                        Available in private chats only.
- */
-case class KeyboardButton(
-  text: String,
-  requestContact: Option[Boolean] = None,
-  requestLocation: Option[Boolean] = None)
+sealed trait KeyboardMarkup
 
 /**
  * This object represents a custom keyboard with reply options.
@@ -57,7 +42,72 @@ case class ReplyKeyboardMarkup(
   resizeKeyboard: Option[Boolean] = None,
   oneTimeKeyboard: Option[Boolean] = None,
   selective: Option[Boolean] = None
+) extends KeyboardMarkup
+
+/**
+ * This object represents one button of the reply keyboard.
+ *
+ * @param text 	          Text of the button. If none of the optional fields are used,
+ *                        it will be sent to the bot as a message when the button is pressed.
+ * @param requestContact  If True, the user's phone number will be sent as a contact
+ *                        when the button is pressed. Available in private chats only.
+ * @param requestLocation If True, the user's current location will be sent when the button is pressed.
+ *                        Available in private chats only.
+ */
+case class KeyboardButton(
+  text: String,
+  requestContact: Option[Boolean] = None,
+  requestLocation: Option[Boolean] = None
 )
+
+/**
+ * This object represents an inline keyboard that appears right next to the message it belongs to.
+ *
+ * @param inlineKeyboard Array of button rows, each represented by an Array of
+ *                       [[InlineKeyboardButton]] objects.
+ */
+case class InlineKeyboardMarkup(inlineKeyboard: Seq[Seq[InlineKeyboardButton]]) extends KeyboardMarkup
+
+/**
+ * This trait represents one button of an inline keyboard.
+ */
+trait InlineKeyboardButton {
+  val text: String
+  val switchInlineQuery: Option[String]
+}
+
+/**
+ * This object represents one button of an inline keyboard.
+ *
+ * @param text Label text on the button
+ * @param callbackData Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes
+ * @param switchInlineQuery If set, pressing the button will prompt the user to select one of their
+ *                          chats, open that chat and insert the bot‘s username and the specified
+ *                          inline query in the input field. Can be empty, in which case just
+ *                          the bot’s username will be inserted.
+ */
+case class InlineCallbackKeyboardButton(
+  text: String,
+  callbackData: String,
+  switchInlineQuery: Option[String] = None
+) extends InlineKeyboardButton
+
+/**
+ * This object represents one button of an inline keyboard.
+ *
+ * @param text Label text on the button
+ * @param url HTTP url to be opened when button is pressed
+ * @param switchInlineQuery If set, pressing the button will prompt the user to select one of their
+ *                          chats, open that chat and insert the bot‘s username and the specified
+ *                          inline query in the input field. Can be empty, in which case just
+ *                          the bot’s username will be inserted.
+ */
+case class InlineUrlKeyboardButton(
+  text: String,
+  url: String,
+  switchInlineQuery: Option[String] = None
+) extends InlineKeyboardButton
+
 
 trait TextAnswer extends Answer {
 
@@ -94,7 +144,7 @@ trait TextAnswer extends Answer {
 case class FlatAnswer(
   chatId: Long,
   content: String,
-  replyMarkup: Option[ReplyKeyboardMarkup] = None,
+  replyMarkup: Option[KeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None) extends TextAnswer {
@@ -106,7 +156,7 @@ case class FlatAnswer(
 case class MarkdownAnswer(
   chatId: Long,
   content: String,
-  replyMarkup: Option[ReplyKeyboardMarkup] = None,
+  replyMarkup: Option[KeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None,
@@ -118,7 +168,7 @@ case class MarkdownAnswer(
 case class HtmlAnswer(
   chatId: Long,
   content: String,
-  replyMarkup: Option[ReplyKeyboardMarkup] = None,
+  replyMarkup: Option[KeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None,
@@ -134,7 +184,7 @@ case class PhotoAnswer(
   chatId: Long,
   photo: String, // TODO: add InputFile support
   caption: Option[String],
-  replyMarkup: Option[ReplyKeyboardMarkup] = None,
+  replyMarkup: Option[KeyboardMarkup] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None
 ) extends Answer
@@ -148,7 +198,7 @@ case class PhotoAnswer(
 case class StickerAnswer(
   chatId: Long,
   sticker: String, // TODO: add InputFile support
-  replyMarkup: Option[ReplyKeyboardMarkup] = None,
+  replyMarkup: Option[KeyboardMarkup] = None,
   disableNotification: Option[Boolean] = None,
   replyToMessageId: Option[Long] = None
 ) extends Answer

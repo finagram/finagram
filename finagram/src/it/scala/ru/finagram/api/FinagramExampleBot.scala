@@ -1,7 +1,7 @@
 package ru.finagram.api
 
 import com.typesafe.config.ConfigFactory
-import ru.finagram.{ FinagramBot, Keyboard, NotHandledMessageException, Polling }
+import ru.finagram.{ FinagramBot, NotHandledMessageException, Polling }
 import ru.finagram.Answers._
 
 import scala.util.Random
@@ -37,7 +37,13 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
     text("Keyboard", Some(keyboard))
   }
 
-
+  on("/inlinekeyboard") {
+    val keyboard = new InlineKeyboard()
+      .buttons("1" -> "/1", "2" -> "3")
+      .buttons("google" -> "https://google.com", "stackoverflow" -> "http://stackoverflow.com/")
+      .create()
+    text("Keyboard", Some(keyboard))
+  }
 
   run()
 

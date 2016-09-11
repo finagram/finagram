@@ -10,7 +10,7 @@ import scala.io.Source
 
 object Answers {
 
-  final def text(text: String, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
+  final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
     FlatAnswer(
       chatId = message.chat.id,
       content = text,
@@ -18,7 +18,7 @@ object Answers {
     )
   }
 
-  final def markdown(text: String, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
+  final def markdown(text: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
     MarkdownAnswer(
       chatId = message.chat.id,
       content = text,
@@ -26,7 +26,7 @@ object Answers {
     )
   }
 
-  final def html(text: String, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
+  final def html(text: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
     HtmlAnswer(
       chatId = message.chat.id,
       content = text,
@@ -34,7 +34,7 @@ object Answers {
     )
   }
 
-  final def photo(photo: String, caption: Option[String] = None, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
+  final def photo(photo: String, caption: Option[String] = None, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
     PhotoAnswer(
       chatId = message.chat.id,
       photo = photo,
@@ -43,7 +43,7 @@ object Answers {
     )
   }
 
-  final def sticker(sticker: String, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
+  final def sticker(sticker: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
     StickerAnswer(
       chatId = message.chat.id,
       sticker = sticker,

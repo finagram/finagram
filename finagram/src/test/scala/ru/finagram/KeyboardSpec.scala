@@ -1,7 +1,7 @@
 package ru.finagram
 
-import ru.finagram.Keyboard.{ oneTime, resize, selective }
-import ru.finagram.api.KeyboardButton
+import ru.finagram.api.Keyboard.{ oneTime, resize, selective }
+import ru.finagram.api.{ Keyboard, KeyboardButton }
 import ru.finagram.util.Spec
 
 class KeyboardSpec extends Spec {
