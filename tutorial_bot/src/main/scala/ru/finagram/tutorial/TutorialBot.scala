@@ -3,11 +3,12 @@ package ru.finagram.tutorial
 import ru.finagram.{ FinagramBot, Keyboard, Polling }
 import ru.finagram.Answers._
 import ru.finagram.Keyboard.{ oneTime, resize }
+import ru.finagram.api.{ Answer, Message, TextMessage }
 
 object TutorialBot extends App with FinagramBot with TextAnswerExamples with Polling {
   override val token: String = from("/tutorial.token")
 
-  on("/start") {
+  on("/start", "/help") {
     markdown(
       """
         |*Finagram Tutorial Bot*
@@ -31,5 +32,11 @@ object TutorialBot extends App with FinagramBot with TextAnswerExamples with Pol
     markdown(code(from("/hello.scala")))
   }
 
+  /**
+   * Default handler for commands without handler.
+   */
+  override def defaultHandler(msg: Message): Option[Answer] = Some(text(s"Unsupported message $msg")(msg))
+
   run()
+
 }

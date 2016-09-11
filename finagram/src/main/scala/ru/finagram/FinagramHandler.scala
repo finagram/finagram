@@ -13,18 +13,24 @@ trait FinagramHandler {
 
   /**
    * Add handle for specified text from user.
-   * Every text should contain only one handle otherwise [[IllegalArgumentException]] will be thrown.
+   * Every command should contain only one handle otherwise [[IllegalArgumentException]] will be thrown.
    *
-   * @param text Text from user. Cannot be empty.
-   * @param handler Logic for create answer for received text.
+   * @param commands Commands from user. It should contains at least one command.
+   *                 Every command cannot be blank string.
+   * @param handler Logic for create answer for received command from list.
    */
-  final def on(text: String)(handler: (Message) => Answer): Unit = {
-    if (text.trim.isEmpty) {
-      throw new IllegalArgumentException("Text cannot be empty")
+  final def on(commands: String*)(handler: (Message) => Answer): Unit = {
+    if (commands.isEmpty) {
+      throw new IllegalArgumentException("Commands list cannot be empty.")
     }
-    if (handlers.contains(text)) {
-      throw new IllegalArgumentException(s"Handler for command $text already registered.")
+    commands.foreach { command =>
+      if (command.trim.isEmpty) {
+        throw new IllegalArgumentException("Command cannot be blank")
+      }
+      if (handlers.contains(command)) {
+        throw new IllegalArgumentException(s"Handler for command $command already registered.")
+      }
+      handlers(command) = handler
     }
-    handlers(text) = handler
   }
 }

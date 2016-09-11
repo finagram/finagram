@@ -25,8 +25,8 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
     sticker("BQADBAADtgQAAjZHEwABA70wjTd86fIC")
   }
 
-  on("/long") {
-    text(Random.nextString(4090))
+  on("/one", "/two") {
+    text("/one or /two")
   }
 
   on("/keyboard") {
