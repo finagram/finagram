@@ -7,7 +7,7 @@ import ru.finagram.Answers._
 import scala.util.Random
 
 object FinagramExampleBot extends App with FinagramBot with Polling {
-  override val token: String = ConfigFactory.load("example.conf").getString("token")
+  override val token: String = from("/example.token")
 
   on("/text") {
     text("flat text")
@@ -50,7 +50,7 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
   /**
    * Default handler for commands without handler.
    */
-  override def defaultHandler(msg: Message) = Some(text(s"Unknown message $msg")(msg))
+  override def defaultHandler(update: Update) = Some(text(s"Unknown update $update")(update))
 
   /**
    * Handle any errors.

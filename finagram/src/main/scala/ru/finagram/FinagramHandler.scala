@@ -1,6 +1,6 @@
 package ru.finagram
 
-import ru.finagram.api.{ Answer, Message }
+import ru.finagram.api.{ Answer, Update }
 
 import scala.collection.mutable
 
@@ -9,17 +9,17 @@ import scala.collection.mutable
  */
 trait FinagramHandler {
 
-  private[finagram] val handlers: mutable.Map[String, (Message) => Answer]
+  private[finagram] val handlers: mutable.Map[String, (Update) => Answer]
 
   /**
    * Add handle for specified text from user.
    * Every command should contain only one handle otherwise [[IllegalArgumentException]] will be thrown.
    *
    * @param commands Commands from user. It should contains at least one command.
-   *                 Every command cannot be blank string.
+   *                 Every command cannot be blank string and should begin from /.
    * @param handler Logic for create answer for received command from list.
    */
-  final def on(commands: String*)(handler: (Message) => Answer): Unit = {
+  final def on(commands: String*)(handler: (Update) => Answer): Unit = {
     if (commands.isEmpty) {
       throw new IllegalArgumentException("Commands list cannot be empty.")
     }

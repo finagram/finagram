@@ -8,14 +8,15 @@ object MessageSerializer extends Serializer[Message] {
 
   private val MessageClass = classOf[Message]
 
-  private implicit val formats = DefaultFormats
-
   override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Message] = {
     case (TypeInfo(MessageClass, _), json: JObject) =>
       json.values match {
-        case v if v.contains("text") => json.extract[TextMessage]
-        case v if v.contains("sticker") => json.extract[StickerMessage]
-        case _ => ???
+        case v if v.contains("text") =>
+          json.extract[TextMessage]
+        case v if v.contains("sticker") =>
+          json.extract[StickerMessage]
+        case _ =>
+          ???
       }
   }
 
@@ -31,5 +32,8 @@ object MessageSerializer extends Serializer[Message] {
     if (m.from.isEmpty) jobject else jobject ~~ ("from", json(m.from.get))
   }
 
-  private def  json(obj: AnyRef): JValue = Extraction.decompose(obj)
+  private def  json(obj: AnyRef): JValue = {
+    implicit val formats = DefaultFormats
+    Extraction.decompose(obj)
+  }
 }

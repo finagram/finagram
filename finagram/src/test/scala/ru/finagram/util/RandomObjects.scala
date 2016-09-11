@@ -55,12 +55,12 @@ object RandomObjects {
 
   def randomUpdates(count: Int) = {
     val k = abs(randomInt())
-    Updates((1 to count).map(i => randomUpdate(i * k)))
+    Updates((1 to count).map(i => randomMessageUpdate(i * k)))
   }
 
-  def randomUpdate(id: Int = randomInt()) = Update(
+  def randomMessageUpdate(id: Int = randomInt()) = MessageUpdate(
     id,
-    Some(randomTextMessage())
+    randomTextMessage()
   )
 
   private def date = System.currentTimeMillis()

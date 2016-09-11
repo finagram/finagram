@@ -59,23 +59,8 @@ trait Polling extends MessageReceiver {
    */
   private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Option[Long]] = {
     Future.collect(updates.map { update =>
-      handleUpdate(update).map(_ => update.updateId + 1)
+      takeAnswerFor(update).map(_ => update.updateId + 1)
     }).map(_.lastOption)
-  }
-
-  private def handleUpdate(update: Update): Future[Unit] = {
-    update.message match {
-      case Some(message) =>
-        takeAnswerFor(message)
-          .flatMap {
-            case Some(answer) =>
-              client.sendAnswer(token, answer)
-            case None =>
-              Future.Done
-          }
-      case None =>
-        Future.Done
-    }
   }
 
   /**
@@ -83,11 +68,11 @@ trait Polling extends MessageReceiver {
    * or exception will threw then return [[None]].
    * will returned.
    *
-   * @param message message from Telegram's response.
+   * @param update incoming update from Telegram.
    * @return custom bot answer to message or [[None]].
    */
-  private def takeAnswerFor(message: Message): Future[Option[Answer]] = {
-    FuturePool.unboundedPool(handle(message))
+  private def takeAnswerFor(update: Update): Future[Option[Answer]] = {
+    FuturePool.unboundedPool(handle(update))
       .handle(handleError.orElse(defaultErrorHandler).andThen(_ => None))
   }
 

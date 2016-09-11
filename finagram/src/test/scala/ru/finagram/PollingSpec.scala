@@ -23,7 +23,7 @@ class PollingSpec extends Spec {
       val nextOffset = Await result polling.poll(0)
 
       // then:
-      verify(polling, times(3)).handle(any[Message])
+      verify(polling, times(3)).handle(any[Update])
       nextOffset should be(updates.result.last.updateId + 1)
     }
     it("should not stop polling when some handler throw exception") {
@@ -38,19 +38,19 @@ class PollingSpec extends Spec {
       Await result polling.poll(0)
 
       // then:
-      verify(polling, times(3)).handle(any[Message])
+      verify(polling, times(3)).handle(any[Update])
     }
   }
 
   private class TestPolling(
     override val token: String,
     override val client: TelegramClient = mock[TelegramClient],
-    answer: (Message) => Answer
+    answer: (Update) => Answer
   ) extends Polling {
     override val log: Logger = PollingSpec.this.log
-    override def handle(message: Message): Option[Answer] = {
-      log.info(s"$message")
-      Some(answer(message))
+    override def handle(update: Update): Option[Answer] = {
+      log.info(s"$update")
+      Some(answer(update))
     }
     // only IllegalArgumentException can be handled, but all other exception should not crash app
     override def handleError: PartialFunction[Throwable, Unit] = { case e: IllegalArgumentException => log.error(e.getMessage) }

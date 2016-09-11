@@ -10,42 +10,42 @@ import scala.io.Source
 
 object Answers {
 
-  final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
+  final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
     FlatAnswer(
-      chatId = message.chat.id,
+      chatId = extractChatId(update),
       content = text,
       keyboard
     )
   }
 
-  final def markdown(text: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
+  final def markdown(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
     MarkdownAnswer(
-      chatId = message.chat.id,
+      chatId = extractChatId(update),
       content = text,
       keyboard
     )
   }
 
-  final def html(text: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
+  final def html(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
     HtmlAnswer(
-      chatId = message.chat.id,
+      chatId = extractChatId(update),
       content = text,
       keyboard
     )
   }
 
-  final def photo(photo: String, caption: Option[String] = None, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
+  final def photo(photo: String, caption: Option[String] = None, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
     PhotoAnswer(
-      chatId = message.chat.id,
+      chatId = extractChatId(update),
       photo = photo,
       caption = caption,
       keyboard
     )
   }
 
-  final def sticker(sticker: String, keyboard: Option[KeyboardMarkup] = None)(message: Message) = {
+  final def sticker(sticker: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
     StickerAnswer(
-      chatId = message.chat.id,
+      chatId = extractChatId(update),
       sticker = sticker,
       keyboard
     )
@@ -72,5 +72,12 @@ object Answers {
 
   final def code(code: String, lang: String = "java") = {
     s"```$lang\n$code\n```"
+  }
+
+  private def extractChatId: PartialFunction[Update, Long] = {
+    case MessageUpdate(_, message: Message) =>
+      message.chat.id
+    case _ =>
+      ???
   }
 }

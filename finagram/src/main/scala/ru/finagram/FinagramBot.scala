@@ -21,40 +21,51 @@ trait FinagramBot extends FinagramHandler {
    */
   val token: String
 
-  override private[finagram] val handlers = mutable.Map[String, (Message) => Answer]()
+  override private[finagram] val handlers = mutable.Map[String, (Update) => Answer]()
 
   /**
    * Create answer for message.
    *
-   * @param message Message from Telegram.
+   * @param update incoming update from Telegram.
    * @return answer if handler for message was found or [[None]].
    */
-  override final def handle(message: Message): Option[Answer] = {
-    message match {
-      // invoke handler for text message
-      case msg: TextMessage =>
-        if (handlers.contains(msg.command)) {
-          log.debug(s"Invoke handler for text message $message")
-          Some(handlers(msg.command)(message))
-        } else {
-          defaultHandler(message)
+  override final def handle(update: Update): Option[Answer] = {
+    update match {
+      case MessageUpdate(_, message) =>
+        message match {
+          // invoke handler for text message
+          case msg: TextMessage if (handlers.contains(extractCommand(msg))) =>
+              log.debug(s"Invoke handler for text message $message")
+              Some(handlers(extractCommand(msg))(update))
+          // TODO add support of other message types
+          case _ =>
+            defaultHandler(update)
         }
-      // TODO add support of other message types
       case _ =>
-        throw new NotHandledMessageException("Received not handled message: " + message)
+        ???
     }
   }
 
   /**
    * Default handler for commands without handler.
    */
-   def defaultHandler(msg: Message): Option[Answer] = None
+   def defaultHandler(update: Update): Option[Answer] = None
 
   /**
    * Handle any errors.
    */
   def onError: PartialFunction[Throwable, Unit] = {
     case e => log.error("Something wrong", e)
+  }
+
+  /**
+   * Return substring from text that contains only command.
+   * Command should begin from '/' and end with space symbol or end of the string.
+   *
+   * @return substring that contains only command.
+   */
+  def extractCommand(message: TextMessage): String = {
+    message.text.replaceFirst("\\s.*", "")
   }
 }
 
