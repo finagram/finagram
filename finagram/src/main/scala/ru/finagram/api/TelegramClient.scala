@@ -11,7 +11,10 @@ import ru.finagram.UnexpectedResponseException
 /**
  * Contains methods for issue http requests to Telegram.
  */
-class TelegramClient private[finagram] (http: Service[Request, Response]) {
+class TelegramClient private[finagram] (http: Service[Request, Response] = Http.client
+  .withTls("api.telegram.org")
+  .newService("api.telegram.org:443")
+) {
 
   private val log = LoggerFactory.getLogger(getClass)
 
@@ -90,7 +93,7 @@ class TelegramClient private[finagram] (http: Service[Request, Response]) {
    */
   private def verifyResponseStatus(res: Response): Response = {
     if (!(200 to 299).contains(res.statusCode)) {
-      throw new UnexpectedResponseException("Unexpected response status " + res.status)
+      throw new UnexpectedResponseException(s"Unexpected response status: ${res.statusCode}.\n${res.contentString} ")
     }
     res
   }
@@ -116,7 +119,7 @@ class TelegramClient private[finagram] (http: Service[Request, Response]) {
    * @return http request.
    */
   private def postAnswer(token: String, answer: Answer): Request = {
-    val content = compact(render(Extraction.decompose(answer).snakizeKeys))
+    val content = compact(render(AnswerSerializer.serialize(answer)))
     log.trace(s"Prepared answer $content")
 
     val request = answer match {
@@ -129,18 +132,5 @@ class TelegramClient private[finagram] (http: Service[Request, Response]) {
     request.setContentTypeJson()
     request.contentString = content
     request
-  }
-}
-
-object TelegramClient {
-
-  def apply(): TelegramClient = {
-    /**
-     * Asynchronous http client.
-     */
-    val http = Http.client
-      .withTls("api.telegram.org")
-      .newService("api.telegram.org:443")
-    new TelegramClient(http)
   }
 }

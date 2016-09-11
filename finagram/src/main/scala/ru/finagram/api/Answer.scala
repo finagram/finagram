@@ -61,21 +61,27 @@ case class ReplyKeyboardMarkup(
 
 trait TextAnswer extends Answer {
   /**
-   * Text of the message to be sent
+   * The actual UTF-8 text of the message, 0-4096 characters.
    */
-  val text: String
+  final val text: String = {
+    if (content.length > 4096)
+      throw ContentIsTooLongException(content.length)
+    content
+  }
 
   /**
    * Disables link previews for links in this message
    */
   val disableWebPagePreview: Option[Boolean]
+
+  protected val content: String
 }
 
 /**
  * Simple text answer without formatting.
  *
  * @param chatId Identifier for the target chat or username of the target channel (in the format @channelusername)
- * @param text Text of the message to be sent
+ * @param content Text of the message to be sent
  * @param replyMarkup A custom keyboard with reply options.
  * @param disableWebPagePreview Disables link previews for links in this message
  * @param disableNotification Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
@@ -83,18 +89,19 @@ trait TextAnswer extends Answer {
  */
 case class FlatAnswer(
   chatId: Long,
-  text: String,
+  content: String,
   replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
-  replyToMessageId: Option[Long] = None) extends TextAnswer
+  replyToMessageId: Option[Long] = None) extends TextAnswer {
+}
 
 /**
  * @inheritdoc
  */
 case class MarkdownAnswer(
   chatId: Long,
-  text: String,
+  content: String,
   replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,
@@ -106,7 +113,7 @@ case class MarkdownAnswer(
  */
 case class HtmlAnswer(
   chatId: Long,
-  text: String,
+  content: String,
   replyMarkup: Option[ReplyKeyboardMarkup] = None,
   disableWebPagePreview: Option[Boolean] = None,
   disableNotification: Option[Boolean] = None,

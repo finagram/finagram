@@ -4,6 +4,8 @@ import com.typesafe.config.ConfigFactory
 import ru.finagram.{ FinagramBot, Keyboard, NotHandledMessageException, Polling }
 import ru.finagram.Answers._
 
+import scala.util.Random
+
 object FinagramExampleBot extends App with FinagramBot with Polling {
   override val token: String = ConfigFactory.load("example.conf").getString("token")
 
@@ -21,6 +23,10 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
 
   on("/sticker") {
     sticker("BQADBAADtgQAAjZHEwABA70wjTd86fIC")
+  }
+
+  on("/long") {
+    text(Random.nextString(4090))
   }
 
   on("/keyboard") {

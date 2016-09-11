@@ -26,7 +26,7 @@ trait Polling extends MessageReceiver {
     case e => log.error("Not handled exception:", e)
   }
 
-  private[finagram] val client = TelegramClient()
+  private[finagram] val client = new TelegramClient()
 
   /**
    * Run process of get updates from Telegram.

@@ -13,7 +13,7 @@ object Answers {
   final def text(text: String, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
     FlatAnswer(
       chatId = message.chat.id,
-      text = text,
+      content = text,
       keyboard
     )
   }
@@ -21,7 +21,7 @@ object Answers {
   final def markdown(text: String, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
     MarkdownAnswer(
       chatId = message.chat.id,
-      text = text,
+      content = text,
       keyboard
     )
   }
@@ -29,7 +29,7 @@ object Answers {
   final def html(text: String, keyboard: Option[ReplyKeyboardMarkup] = None)(message: Message) = {
     HtmlAnswer(
       chatId = message.chat.id,
-      text = text,
+      content = text,
       keyboard
     )
   }

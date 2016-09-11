@@ -5,12 +5,14 @@ import org.json4s.{ DefaultFormats, Extraction }
 import ru.finagram.util.RandomObjects._
 import ru.finagram.util.Spec
 
+import scala.util.Random
+
 class MessageSerializerSpec extends Spec {
 
   implicit val formats = DefaultFormats + MessageSerializer
 
-  describe("serialize to json") {
-    it(s"should create expected JObject for text message with 'user'") {
+  describe("serialize message to json") {
+    it(s"should create JObject for text message only with expected fields") {
       // given:
       val msg = randomTextMessage()
 

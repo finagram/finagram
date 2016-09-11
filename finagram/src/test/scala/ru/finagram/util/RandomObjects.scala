@@ -40,10 +40,10 @@ object RandomObjects {
 
   def randomTextMessage(
     id: Int = Random.nextInt(),
-    text: String = Random.nextString(12),
+    content: String = Random.nextString(12),
     user: Option[User] = Some(randomUser()),
     chat: Chat = randomChat()
-  ): TextMessage = TextMessage(id, user, date, chat, text)
+  ): TextMessage = TextMessage(id, user, date, chat, content)
 
   def randomStickerMessage(
     messageId: Long = randomInt(),

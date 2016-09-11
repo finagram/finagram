@@ -8,10 +8,7 @@ object TutorialBot extends App with FinagramBot with TextAnswers with Polling {
   override val token: String = from("/tutorial.token")
 
   on("/start") {
-    val keyboard = new Keyboard(oneTime, resize)
-      .buttons("/text")
-      .createOpt()
-    text("This is Finagram Tutorial Bot", keyboard)
+    markdown(from("/README.md"))
   }
 
   run()
