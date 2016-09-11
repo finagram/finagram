@@ -60,8 +60,9 @@ case class ReplyKeyboardMarkup(
 )
 
 trait TextAnswer extends Answer {
+
   /**
-   * The actual UTF-8 text of the message, 0-4096 characters.
+   * Text of the message to be sent
    */
   final val text: String = {
     if (content.length > 4096)
@@ -74,6 +75,9 @@ trait TextAnswer extends Answer {
    */
   val disableWebPagePreview: Option[Boolean]
 
+  /**
+   * The actual UTF-8 text of the message, 0-4096 characters.
+   */
   protected val content: String
 }
 

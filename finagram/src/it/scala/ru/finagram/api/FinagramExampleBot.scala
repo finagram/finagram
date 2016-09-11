@@ -37,7 +37,14 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
     text("Keyboard", Some(keyboard))
   }
 
+
+
   run()
+
+  /**
+   * Default handler for commands without handler.
+   */
+  override def defaultHandler(msg: Message) = Some(text(s"Unknown message $msg")(msg))
 
   /**
    * Handle any errors.

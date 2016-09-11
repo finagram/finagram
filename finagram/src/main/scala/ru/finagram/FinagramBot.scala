@@ -2,7 +2,7 @@ package ru.finagram
 
 import com.twitter.finagle.http.{ Message => _ }
 import org.slf4j.LoggerFactory
-import ru.finagram.api._
+import ru.finagram.api.{ Answer, Message, _ }
 
 import scala.collection.mutable
 
@@ -34,16 +34,21 @@ trait FinagramBot extends FinagramHandler {
       // invoke handler for text message
       case msg: TextMessage =>
         if (handlers.contains(msg.command)) {
-          log.debug(s"Invoke handler for message $message")
+          log.debug(s"Invoke handler for text message $message")
           Some(handlers(msg.command)(message))
         } else {
-          None
+          defaultHandler(message)
         }
       // TODO add support of other message types
       case _ =>
         throw new NotHandledMessageException("Received not handled message: " + message)
     }
   }
+
+  /**
+   * Default handler for commands without handler.
+   */
+   def defaultHandler(msg: Message): Option[Answer] = None
 
   /**
    * Handle any errors.

@@ -69,4 +69,8 @@ object Answers {
     }
     source.mkString
   }
+
+  final def code(code: String, lang: String = "java") = {
+    s"```$lang\n$code\n```"
+  }
 }

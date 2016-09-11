@@ -4,10 +4,22 @@ import ru.finagram.Answers._
 import ru.finagram.Keyboard.{ oneTime, resize }
 import ru.finagram.{ FinagramHandler, Keyboard }
 
-trait TextAnswers extends FinagramHandler {
+trait AnswersExamples extends FinagramHandler {
+  on("/answer") {
+    text(
+      """
+        |Supported types of answer:
+        |1. Text /text
+        |2. File /file
+        |3. Sticker /sticker
+      """.stripMargin
+    )
+  }
+}
+
+trait TextAnswerExamples extends FinagramHandler {
 
   val textAnswersKeyboard = new Keyboard(oneTime, resize)
-    .buttons("/start")
     .buttons("/flat", "/markdown", "/html")
     .createOpt()
 
@@ -26,9 +38,4 @@ trait TextAnswers extends FinagramHandler {
   on("/html") {
     markdown(code(from("/html.scala")), textAnswersKeyboard)
   }
-
-  private def code(code: String) = {
-    s"```java\n$code\n```"
-  }
-
 }
