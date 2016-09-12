@@ -2,7 +2,7 @@ package ru.finagram
 
 import com.twitter.finagle.http.{ Message => _ }
 import org.slf4j.LoggerFactory
-import ru.finagram.api.{ Answer, Message, _ }
+import ru.finagram.api.{ Answer, _ }
 
 import scala.collection.mutable
 
@@ -30,20 +30,12 @@ trait FinagramBot extends FinagramHandler {
    * @return answer if handler for message was found or [[None]].
    */
   override final def handle(update: Update): Option[Answer] = {
-    update match {
-      case MessageUpdate(_, message) =>
-        message match {
-          // invoke handler for text message
-          case msg: TextMessage if (handlers.contains(extractCommand(msg))) =>
-              val command = extractCommand(msg)
-              log.debug(s"Invoke handler for command $command")
-              Some(handlers(command)(update))
-          // TODO add support of other message types
-          case _ =>
-            defaultHandler(update)
-        }
+    extractCommand(update) match {
+      case Some(command) if handlers.contains(command) =>
+        log.debug(s"Invoke handler for command $command")
+        Some(handlers(command)(update))
       case _ =>
-        ???
+        defaultHandler(update)
     }
   }
 
@@ -59,14 +51,24 @@ trait FinagramBot extends FinagramHandler {
     case e => log.error("Something wrong", e)
   }
 
-  /**
-   * Return substring from text that contains only command.
-   * Command should begin from '/' and end with space symbol or end of the string.
-   *
-   * @return substring that contains only command.
-   */
-  def extractCommand(message: TextMessage): String = {
-    message.text.replaceFirst("\\s.*", "")
+  private def extractCommand(update: Update): Option[String] = {
+    // TODO maybe delegate it to the external 'Extractor'?
+    update match {
+      case MessageUpdate(_, message) =>
+        message match {
+          // invoke handler for text message
+          case msg: TextMessage =>
+            Some(msg.text.replaceFirst("\\s.*", ""))
+
+          case _ => None
+        }
+
+      case CallbackQueryUpdate(_, callback) =>
+        Some(callback.data.replaceFirst("\\s.*", ""))
+
+      case _ => ???
+    }
+
   }
 }
 

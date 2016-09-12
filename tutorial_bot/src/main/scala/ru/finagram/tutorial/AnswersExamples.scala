@@ -7,36 +7,61 @@ import ru.finagram.api.{ InlineKeyboard, Keyboard }
 
 trait AnswersExamples extends FinagramHandler {
   on("/answer") {
-    text(
+    markdown(
       """
-        |Supported types of answer:
+        |*Supported types of answer:*
         |1. Text /text
         |2. File /file
         |3. Sticker /sticker
       """.stripMargin
     )
   }
-}
-
-trait TextAnswerExamples extends FinagramHandler {
-
-  val textAnswersKeyboard = new InlineKeyboard()
-    .buttons("flat text" -> "/flat", "markdown" -> "/markdown", "html" ->"/html")
-    .createOpt()
 
   on("/text") {
-    text("What kind of text answer you need:", textAnswersKeyboard)
+    markdown(
+      """
+        |*What kind of text answer you need:*
+        |1. Flat text: /flat
+        |2. Markdown: /markdown
+        |3. Html: /html
+      """.stripMargin
+    )
   }
 
+  val textAnswersKeyboard = new InlineKeyboard()
+    .buttons("back" -> "/text", "other answers" -> "/answer", "all examples" -> "/examples")
+    .createOpt()
+
   on("/flat") {
-    markdown(code(from("/text.scala")), textAnswersKeyboard)
+    markdown(
+      s"""
+        |*Flat answer example*
+        |
+        |${code(from("/text.scala"))}
+      """.stripMargin,
+      textAnswersKeyboard
+    )
   }
 
   on("/markdown") {
-    markdown(code(from("/markdown.scala")), textAnswersKeyboard)
+    markdown(
+      s"""
+         |*Markdown answer example*
+         |
+         |${code(from("/markdown.scala"))}
+      """.stripMargin,
+      textAnswersKeyboard
+    )
   }
 
   on("/html") {
-    markdown(code(from("/html.scala")), textAnswersKeyboard)
+    markdown(
+      s"""
+         |*Html answer example*
+         |
+         |${code(from("/html.scala"))}
+      """.stripMargin,
+      textAnswersKeyboard
+    )
   }
 }

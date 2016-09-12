@@ -77,6 +77,10 @@ object Answers {
   private def extractChatId: PartialFunction[Update, Long] = {
     case MessageUpdate(_, message: Message) =>
       message.chat.id
+
+    case CallbackQueryUpdate(_, callback) =>
+      callback.from.id
+
     case _ =>
       ???
   }
