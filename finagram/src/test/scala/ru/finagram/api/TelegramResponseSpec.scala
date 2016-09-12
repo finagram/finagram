@@ -47,7 +47,7 @@ class TelegramResponseSpec extends Spec {
   }
 
   describe("parse response with messages") {
-    it(s"should create instance of $Updates") {
+    it(s"should create instance of $Updates with two $MessageUpdate in result") {
       // given:
       val content =
       """
@@ -61,14 +61,12 @@ class TelegramResponseSpec extends Spec {
         |          "from":{
         |             "id":192047269,
         |             "first_name":"Vladimir",
-        |             "last_name":"Popov",
-        |             "username":"dokwork_ru"
+        |             "last_name":"Popov"
         |          },
         |          "chat":{
         |             "id":192047269,
         |             "first_name":"Vladimir",
         |             "last_name":"Popov",
-        |             "username":"dokwork_ru",
         |             "type":"private"
         |          },
         |          "date":1470854050,
@@ -82,14 +80,12 @@ class TelegramResponseSpec extends Spec {
         |            "from":{
         |               "id":192047269,
         |               "first_name":"Vladimir",
-        |               "last_name":"Popov",
-        |               "username":"dokwork_ru"
+        |               "last_name":"Popov"
         |            },
         |            "chat":{
         |               "id":192047269,
         |               "first_name":"Vladimir",
         |               "last_name":"Popov",
-        |               "username":"dokwork_ru",
         |               "type":"private"
         |            },
         |            "date":1470854071,
@@ -111,9 +107,9 @@ class TelegramResponseSpec extends Spec {
           updateId should be(217684885)
           message should be(TextMessage(
             messageId = 82,
-            from = Some(User(192047269, "Vladimir", Some("Popov"), Some("dokwork_ru"))),
+            from = Some(User(192047269, "Vladimir", Some("Popov"))),
             date = 1470854050,
-            chat = Chat(192047269, "private", None, Some("Vladimir"), Some("Popov"), Some("dokwork_ru")),
+            chat = Chat(192047269, "private", None, Some("Vladimir"), Some("Popov")),
             text = "first"
           ))
       }
@@ -122,12 +118,76 @@ class TelegramResponseSpec extends Spec {
           updateId should be(217684886)
           message should be(TextMessage(
             messageId = 83,
-            from = Some(User(192047269, "Vladimir", Some("Popov"), Some("dokwork_ru"))),
+            from = Some(User(192047269, "Vladimir", Some("Popov"))),
             date = 1470854071,
-            chat = Chat(192047269, "private", None, Some("Vladimir"), Some("Popov"), Some("dokwork_ru")),
+            chat = Chat(192047269, "private", None, Some("Vladimir"), Some("Popov")),
             text = "second"
           ))
       }
+    }
+  }
+
+  describe("parse response with callback query") {
+    it(s"should create instance of $Updates with $CallbackQueryUpdate") {
+      // given:
+      val content =
+      """
+        |{
+        |   "ok":true,
+        |   "result":[
+        |      {
+        |         "update_id":353441033,
+        |         "callback_query":{
+        |            "id":"824836741025835269",
+        |            "from":{
+        |               "id":192047269,
+        |               "first_name":"Vladimir",
+        |               "last_name":"Popov",
+        |            },
+        |            "message":{
+        |               "message_id":175,
+        |               "from":{
+        |                  "id":255752647,
+        |                  "first_name":"example"
+        |               },
+        |               "chat":{
+        |                  "id":192047269,
+        |                  "first_name":"Vladimir",
+        |                  "last_name":"Popov",
+        |                  "type":"private"
+        |               },
+        |               "date":1473608617,
+        |               "text":"Keyboard"
+        |            },
+        |            "data":"some text data"
+        |         }
+        |      }
+        |   ]
+        |}
+      """.stripMargin
+
+      // when:
+      val updates = TelegramResponse(content).asInstanceOf[Updates]
+
+      // then:
+      updates.ok should be(true)
+      updates.result should contain(
+        CallbackQueryUpdate(
+          updateId = 353441033,
+          callbackQuery = CallbackQuery(
+            id = "824836741025835269",
+            from = User(192047269, "Vladimir", Some("Popov")),
+            message = Some(TextMessage(
+              175L,
+              Some(User(255752647, "example")),
+              1473608617L,
+              Chat(192047269, "private", firstName = Some("Vladimir"), lastName = Some("Popov")),
+              "Keyboard"
+            )),
+            data = "some text data"
+            )
+          )
+        )
     }
   }
 }

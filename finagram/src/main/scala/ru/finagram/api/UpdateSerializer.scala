@@ -13,6 +13,8 @@ object UpdateSerializer extends Serializer[Update] {
       json.values match {
         case v if v.contains("message") =>
           json.extract[MessageUpdate]
+        case v if v.contains("callbackQuery") =>
+          json.extract[CallbackQueryUpdate]
         case _ =>
           ???
       }
@@ -21,6 +23,8 @@ object UpdateSerializer extends Serializer[Update] {
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
     case u: MessageUpdate =>
       ("update_id" -> u.updateId) ~~ ("message" -> json(u.message))
+    case u: CallbackQueryUpdate =>
+      ("update_id" -> u.updateId) ~~ ("callback_query" -> json(u.callbackQuery))
   }
 
   private def  json(obj: AnyRef): JValue = {

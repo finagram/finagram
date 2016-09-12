@@ -21,7 +21,7 @@ sealed trait Message {
  * @param lastName	  User‘s or bot’s last name.
  * @param username	  User‘s or bot’s username.
  */
-case class User(id: Int, firstName: String, lastName: Option[String], username: Option[String])
+case class User(id: Int, firstName: String, lastName: Option[String] = None, username: Option[String] = None)
 
 /**
  * This class represents a chat.
