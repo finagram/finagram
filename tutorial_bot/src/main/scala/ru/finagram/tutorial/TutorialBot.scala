@@ -3,7 +3,7 @@ package ru.finagram.tutorial
 import ru.finagram.{ FinagramBot, Polling }
 import ru.finagram.Answers._
 import ru.finagram.api.Keyboard.{ oneTime, resize }
-import ru.finagram.api.{ Answer, Message, TextMessage }
+import ru.finagram.api.{ Answer, Message, TextMessage, Update }
 
 object TutorialBot extends App with FinagramBot with TextAnswerExamples with Polling {
   override val token: String = from("/tutorial.token")
@@ -35,7 +35,7 @@ object TutorialBot extends App with FinagramBot with TextAnswerExamples with Pol
   /**
    * Default handler for commands without handler.
    */
-  override def defaultHandler(msg: Message): Option[Answer] = Some(text(s"Unsupported message $msg")(msg))
+  override def defaultHandler(update: Update): Option[Answer] = Some(text(s"Unsupported update $update")(update))
 
   run()
 

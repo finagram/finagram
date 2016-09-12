@@ -35,8 +35,9 @@ trait FinagramBot extends FinagramHandler {
         message match {
           // invoke handler for text message
           case msg: TextMessage if (handlers.contains(extractCommand(msg))) =>
-              log.debug(s"Invoke handler for text message $message")
-              Some(handlers(extractCommand(msg))(update))
+              val command = extractCommand(msg)
+              log.debug(s"Invoke handler for command $command")
+              Some(handlers(command)(update))
           // TODO add support of other message types
           case _ =>
             defaultHandler(update)

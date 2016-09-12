@@ -16,7 +16,7 @@ class TelegramClientSpec extends Spec {
       val token = randomString()
       val offset = randomInt()
       val limit = randomInt()
-      val http = clientWithResponse(responseWithContent(toJsonString(randomUpdates(0))))
+      val http = clientWithResponse(responseWithContent(toJsonString(randomUpdatesWithMessage(0))))
       val client = new TelegramClient(http)
 
       // when:

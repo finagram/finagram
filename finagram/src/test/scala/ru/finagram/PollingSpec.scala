@@ -13,7 +13,7 @@ class PollingSpec extends Spec {
   describe("poll") {
     it("should invoke handler as many times as updates in the response") {
       // given:
-      val updates = randomUpdates(3)
+      val updates = randomUpdatesWithMessage(3)
       val client = mock[TelegramClient]
       doReturn(Future(updates.result)).when(client).getUpdates(any[String], any[Long], any[Option[Int]])
       doReturn(Future.Unit).when(client).sendAnswer(any[String], any[Answer])
@@ -28,7 +28,7 @@ class PollingSpec extends Spec {
     }
     it("should not stop polling when some handler throw exception") {
       // given:
-      val updates = randomUpdates(3)
+      val updates = randomUpdatesWithMessage(3)
       val client = mock[TelegramClient]
       doReturn(Future(updates.result)).when(client).getUpdates(any[String], any[Long], any[Option[Int]])
       doReturn(Future.Unit).when(client).sendAnswer(any[String], any[Answer])
@@ -39,6 +39,22 @@ class PollingSpec extends Spec {
 
       // then:
       verify(polling, times(3)).handle(any[Update])
+    }
+    it("should send answer for message to Telegram") {
+      // given:
+      val token: String = randomString()
+      val answer = mock[FlatAnswer]
+      val updates = randomUpdatesWithMessage(1)
+      val client = mock[TelegramClient]
+      doReturn(Future(updates.result)).when(client).getUpdates(any[String], any[Long], any[Option[Int]])
+      doReturn(Future.Unit).when(client).sendAnswer(any[String], any[Answer])
+      val polling = new TestPolling(token, client, (_) => answer)
+
+      // when:
+      Await result polling.poll(0)
+
+      // then:
+      verify(client).sendAnswer(token, answer)
     }
   }
 

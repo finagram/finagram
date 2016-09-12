@@ -3,7 +3,7 @@ package ru.finagram.tutorial
 import ru.finagram.Answers._
 import ru.finagram.api.Keyboard.{ oneTime, resize }
 import ru.finagram.FinagramHandler
-import ru.finagram.api.Keyboard
+import ru.finagram.api.{ InlineKeyboard, Keyboard }
 
 trait AnswersExamples extends FinagramHandler {
   on("/answer") {
@@ -20,8 +20,8 @@ trait AnswersExamples extends FinagramHandler {
 
 trait TextAnswerExamples extends FinagramHandler {
 
-  val textAnswersKeyboard = new Keyboard(oneTime, resize)
-    .buttons("/flat", "/markdown", "/html")
+  val textAnswersKeyboard = new InlineKeyboard()
+    .buttons("flat text" -> "/flat", "markdown" -> "/markdown", "html" ->"/html")
     .createOpt()
 
   on("/text") {

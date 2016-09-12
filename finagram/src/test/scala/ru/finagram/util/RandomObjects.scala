@@ -53,9 +53,9 @@ object RandomObjects {
     sticker: Sticker = randomSticker()
   ) = StickerMessage(messageId, from, date, chat, sticker)
 
-  def randomUpdates(count: Int) = {
+  def randomUpdatesWithMessage(count: Int): Updates = {
     val k = abs(randomInt())
-    Updates((1 to count).map(i => randomMessageUpdate(i * k)))
+    Updates((1 to count).map(i => randomMessageUpdate(i * k)): _*)
   }
 
   def randomMessageUpdate(id: Int = randomInt()) = MessageUpdate(
