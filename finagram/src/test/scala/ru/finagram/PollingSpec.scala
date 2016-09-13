@@ -64,9 +64,11 @@ class PollingSpec extends Spec {
     answer: (Update) => Answer
   ) extends Polling {
     override val log: Logger = PollingSpec.this.log
-    override def handle(update: Update): Option[Answer] = {
+    override def handle(update: Update): Future[Option[Answer]] = {
       log.info(s"$update")
-      Some(answer(update))
+      Future {
+        Some(answer(update))
+      }
     }
     // only IllegalArgumentException can be handled, but all other exception should not crash app
     override def handleError: PartialFunction[Throwable, Unit] = { case e: IllegalArgumentException => log.error(e.getMessage) }

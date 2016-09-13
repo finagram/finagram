@@ -1,5 +1,6 @@
 package ru.finagram
 
+import com.twitter.util.Future
 import ru.finagram.api.{ Answer, Update }
 
 /**
@@ -14,5 +15,5 @@ private[finagram] trait MessageReceiver extends Runnable {
    * @return answer or [[None]].
    * @throws Exception any type when unsuccessful handle message.
    */
-  def handle(update: Update): Option[Answer]
+  def handle(update: Update): Future[Option[Answer]]
 }

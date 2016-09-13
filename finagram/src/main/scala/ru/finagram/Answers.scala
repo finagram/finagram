@@ -3,6 +3,7 @@ package ru.finagram
 import java.io.FileNotFoundException
 import java.nio.file.Paths
 
+import com.twitter.util.Future
 import ru.finagram.api._
 
 import scala.io.Source
@@ -10,7 +11,7 @@ import scala.io.Source
 
 object Answers {
 
-  final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
+  final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     FlatAnswer(
       chatId = extractChatId(update),
       content = text,
@@ -18,7 +19,7 @@ object Answers {
     )
   }
 
-  final def markdown(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
+  final def markdown(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     MarkdownAnswer(
       chatId = extractChatId(update),
       content = text,
@@ -26,7 +27,7 @@ object Answers {
     )
   }
 
-  final def html(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
+  final def html(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     HtmlAnswer(
       chatId = extractChatId(update),
       content = text,
@@ -34,7 +35,7 @@ object Answers {
     )
   }
 
-  final def photo(photo: String, caption: Option[String] = None, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
+  final def photo(photo: String, caption: Option[String] = None, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     PhotoAnswer(
       chatId = extractChatId(update),
       photo = photo,
@@ -43,7 +44,7 @@ object Answers {
     )
   }
 
-  final def sticker(sticker: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = {
+  final def sticker(sticker: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     StickerAnswer(
       chatId = extractChatId(update),
       sticker = sticker,

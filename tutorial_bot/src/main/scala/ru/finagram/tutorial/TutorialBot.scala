@@ -1,5 +1,6 @@
 package ru.finagram.tutorial
 
+import com.twitter.util.Future
 import ru.finagram.{ FinagramBot, Polling }
 import ru.finagram.Answers._
 import ru.finagram.api.Keyboard.{ oneTime, resize }
@@ -42,7 +43,7 @@ object TutorialBot extends App with FinagramBot with AnswersExamples with Pollin
   /**
    * Default handler for commands without handler.
    */
-  override def defaultHandler(update: Update): Option[Answer] = Some(text(s"Unsupported update $update")(update))
+  override def defaultHandler(update: Update): Future[Option[Answer]] = text(s"Unsupported update $update")(update).map(Some.apply)
 
   run()
 

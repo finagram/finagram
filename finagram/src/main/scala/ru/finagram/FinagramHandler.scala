@@ -1,5 +1,6 @@
 package ru.finagram
 
+import com.twitter.util.Future
 import ru.finagram.api.{ Answer, Update }
 
 import scala.collection.mutable
@@ -9,7 +10,7 @@ import scala.collection.mutable
  */
 trait FinagramHandler {
 
-  private[finagram] val handlers: mutable.Map[String, (Update) => Answer]
+  private[finagram] val handlers: mutable.Map[String, (Update) => Future[Answer]]
 
   /**
    * Add handle for specified text from user.
@@ -19,7 +20,7 @@ trait FinagramHandler {
    *                 Every command cannot be blank string and should begin from /.
    * @param handler Logic for create answer for received command from list.
    */
-  final def on(commands: String*)(handler: (Update) => Answer): Unit = {
+  final def on(commands: String*)(handler: (Update) => Future[Answer]): Unit = {
     if (commands.isEmpty) {
       throw new IllegalArgumentException("Commands list cannot be empty.")
     }

@@ -1,6 +1,7 @@
 package ru.finagram
 
 import com.twitter.finagle.http.{ Message => _ }
+import com.twitter.util.Future
 import org.slf4j.LoggerFactory
 import ru.finagram.api.{ Answer, _ }
 
@@ -21,7 +22,7 @@ trait FinagramBot extends FinagramHandler {
    */
   val token: String
 
-  override private[finagram] val handlers = mutable.Map[String, (Update) => Answer]()
+  override private[finagram] val handlers = mutable.Map[String, (Update) => Future[Answer]]()
 
   /**
    * Create answer for message.
@@ -29,11 +30,11 @@ trait FinagramBot extends FinagramHandler {
    * @param update incoming update from Telegram.
    * @return answer if handler for message was found or [[None]].
    */
-  override final def handle(update: Update): Option[Answer] = {
+  override final def handle(update: Update): Future[Option[Answer]] = {
     extractCommand(update) match {
       case Some(command) if handlers.contains(command) =>
         log.debug(s"Invoke handler for command $command")
-        Some(handlers(command)(update))
+        handlers(command)(update).map(Some.apply)
       case _ =>
         defaultHandler(update)
     }
@@ -42,7 +43,7 @@ trait FinagramBot extends FinagramHandler {
   /**
    * Default handler for commands without handler.
    */
-   def defaultHandler(update: Update): Option[Answer] = None
+   def defaultHandler(update: Update): Future[Option[Answer]] = Future.None
 
   /**
    * Handle any errors.

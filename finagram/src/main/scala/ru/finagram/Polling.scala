@@ -58,16 +58,18 @@ trait Polling extends MessageReceiver {
    * @return next offset.
    */
   private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Option[Long]] = {
-    Future.collect(updates.map { update =>
-      takeAnswerFor(update)
-        .flatMap {
-          case Some(answer) =>
-            client.sendAnswer(token, answer)
-          case None =>
-            Future.Done
-        }
-        .map(_ => update.updateId + 1)
-    }).map(_.lastOption)
+    Future.collect {
+      updates.map { update =>
+        takeAnswerFor(update)
+          .flatMap {
+            case Some(answer) =>
+              client.sendAnswer(token, answer)
+            case None =>
+              Future.Done
+          }
+          .map(_ => update.updateId + 1)
+      }
+    }.map(_.lastOption)
   }
 
   /**
@@ -79,8 +81,9 @@ trait Polling extends MessageReceiver {
    * @return custom bot answer to message or [[None]].
    */
   private def takeAnswerFor(update: Update): Future[Option[Answer]] = {
-    FuturePool.unboundedPool(handle(update))
-      .handle(handleError.orElse(defaultErrorHandler).andThen(_ => None))
+    handle(update).handle {
+       handleError.orElse(defaultErrorHandler).andThen(_ => None)
+    }
   }
 
   /**

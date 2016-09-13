@@ -1,5 +1,6 @@
 package ru.finagram
 
+import com.twitter.util.Await
 import ru.finagram.api._
 import ru.finagram.util.Spec
 import ru.finagram.Answers._
@@ -24,7 +25,7 @@ class FinagramBotSpec extends Spec {
         }
       }
       // when:
-      val answer = bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command")))
+      val answer = Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command")))
 
       // then:
       answer should contain (FlatAnswer(chat.id, "it's work!"))
@@ -39,7 +40,7 @@ class FinagramBotSpec extends Spec {
       }
       Seq(" ", "\t", "\n").foreach {space =>
         // when:
-        val answer = bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, s"/command${space}some another text")))
+        val answer = Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, s"/command${space}some another text")))
 
         // then:
         answer should contain (FlatAnswer(chat.id, "it's work!"))
@@ -49,7 +50,7 @@ class FinagramBotSpec extends Spec {
       // given:
       val bot = new AnyRef with TestBot
       // when:
-      val result = bot.handle(randomMessageUpdate())
+      val result = Await result bot.handle(randomMessageUpdate())
       // then exception not expected:
       result should be(None)
     }

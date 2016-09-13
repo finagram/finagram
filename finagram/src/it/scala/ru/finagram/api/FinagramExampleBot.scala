@@ -1,10 +1,7 @@
 package ru.finagram.api
 
-import com.typesafe.config.ConfigFactory
-import ru.finagram.{ FinagramBot, NotHandledMessageException, Polling }
 import ru.finagram.Answers._
-
-import scala.util.Random
+import ru.finagram.{ FinagramBot, NotHandledMessageException, Polling }
 
 object FinagramExampleBot extends App with FinagramBot with Polling {
   override val token: String = from("/example.token")
@@ -50,7 +47,7 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
   /**
    * Default handler for commands without handler.
    */
-  override def defaultHandler(update: Update) = Some(text(s"Unknown update $update")(update))
+  override def defaultHandler(update: Update) = text(s"Unknown update $update")(update).map(Some.apply)
 
   /**
    * Handle any errors.
