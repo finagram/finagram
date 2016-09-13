@@ -30,3 +30,12 @@ class InlineKeyboard {
     }
   }
 }
+
+object InlineKeyboard {
+
+  def apply(row: (String, String)*): InlineKeyboardMarkup = {
+    new InlineKeyboard()
+      .buttons(row: _*)
+      .create()
+  }
+}

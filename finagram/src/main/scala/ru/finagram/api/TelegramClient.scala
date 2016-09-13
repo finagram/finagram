@@ -73,7 +73,7 @@ class TelegramClient private[finagram] (http: Service[Request, Response] = Http.
     log.trace(s"Received content: $content")
     Try(TelegramResponse(content)) match {
       case Return(Updates(result)) =>
-        log.debug(s"Received ${result.size} updates")
+        log.trace(s"Received ${result.size} updates")
         result
       case Return(e: TelegramException) =>
         throw e

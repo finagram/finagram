@@ -40,7 +40,7 @@ case class TelegramException(description: String, errorCode: Option[Int])
  *
  * @param result updates from Telegram.
  */
-case class Updates(result: Update*) extends TelegramResponse {
+case class Updates(result: Seq[Update]) extends TelegramResponse {
   val ok = true
 }
 

@@ -31,7 +31,7 @@ trait FinagramBot extends FinagramHandler {
    * @return answer if handler for message was found or [[None]].
    */
   override final def handle(update: Update): Future[Option[Answer]] = {
-    extractCommand(update) match {
+    extractText(update) match {
       case Some(command) if handlers.contains(command) =>
         log.debug(s"Invoke handler for command $command")
         handlers(command)(update).map(Some.apply)
@@ -52,20 +52,20 @@ trait FinagramBot extends FinagramHandler {
     case e => log.error("Something wrong", e)
   }
 
-  private def extractCommand(update: Update): Option[String] = {
+  private def extractText(update: Update): Option[String] = {
     // TODO maybe delegate it to the external 'Extractor'?
     update match {
       case MessageUpdate(_, message) =>
         message match {
           // invoke handler for text message
           case msg: TextMessage =>
-            Some(msg.text.replaceFirst("\\s.*", ""))
+            Some(msg.text)
 
           case _ => None
         }
 
       case CallbackQueryUpdate(_, callback) =>
-        Some(callback.data.replaceFirst("\\s.*", ""))
+        Some(callback.data)
 
       case _ => ???
     }
