@@ -29,6 +29,11 @@ trait Polling extends MessageReceiver {
   private[finagram] val client = new TelegramClient()
 
   /**
+   * Timeout between requests.
+   */
+  val timeout = Duration(700, TimeUnit.MILLISECONDS)
+
+  /**
    * Run process of get updates from Telegram.
    */
   override final def run(): Unit = {
@@ -96,7 +101,7 @@ trait Polling extends MessageReceiver {
    * @return last invoked future.
    */
   private def repeat[T](action: (T) => Future[T], init: T): Future[T] = {
-    action(init).delayed(Duration(1300, TimeUnit.MILLISECONDS))(timer).transform {
+    action(init).delayed(timeout)(timer).transform {
       case Return(result) =>
         repeat(action, result)
       case Throw(e) =>

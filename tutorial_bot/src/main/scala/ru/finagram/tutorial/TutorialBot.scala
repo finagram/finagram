@@ -6,20 +6,13 @@ import ru.finagram.Answers._
 import ru.finagram.api.Keyboard.{ oneTime, resize }
 import ru.finagram.api._
 
-object TutorialBot extends App with FinagramBot with Polling {
+object TutorialBot extends App with FinagramBot with ClientDescription with Polling {
   override val token: String = from("/tutorial.token")
 
   on("/start", "/about") {
     markdown(
       Content.start,
-      Some(InlineKeyboard("github" -> "https://github.com/finagram/finagram", "tutorial" -> "/tutorial"))
-    )
-  }
-
-  on("/tutorial") {
-    markdown(
-      Content.tutorial,
-      Some(InlineKeyboard("next" -> "/select_receiver"))
+      Some(InlineKeyboard("github" -> "https://github.com/finagram/finagram", "next" -> "/select_receiver"))
     )
   }
 
@@ -32,11 +25,21 @@ object TutorialBot extends App with FinagramBot with Polling {
 
   on("/polling") {
     markdown(
-      Content.not_supported
+      Content.polling,
+      new InlineKeyboard()
+        .buttons("▲ How to receive message" -> "/select_receiver", "How to send answer ▼" -> "/handler")
+        .buttons("Telegram client" -> "/client")
+        .createOpt()
     )
   }
 
   on("/webhooks") {
+    markdown(
+      Content.not_supported
+    )
+  }
+
+  on("/handler") {
     markdown(
       Content.not_supported
     )
