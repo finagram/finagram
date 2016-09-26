@@ -12,7 +12,7 @@ class FinagramBotSpec extends Spec {
 
   trait TestBot extends FinagramBot with MessageReceiver {
     override val token: String = "123-123-123"
-    override def run(): Unit = ???
+    override def run(): Unit = {}
   }
 
   describe("handle update") {

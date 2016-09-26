@@ -55,7 +55,7 @@ object RandomObjects {
 
   def randomUpdatesWithMessage(count: Int): Updates = {
     val k = abs(randomInt())
-    Updates((1 to count).map(i => randomMessageUpdate(i * k)): _*)
+    Updates((1 to count).map(i => randomMessageUpdate(i * k)))
   }
 
   def randomMessageUpdate(id: Int = randomInt()) = MessageUpdate(

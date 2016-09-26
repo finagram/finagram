@@ -1,6 +1,5 @@
 package ru.finagram
 
-import ru.finagram.api.Keyboard.{ oneTime, resize, selective }
 import ru.finagram.api.{ Keyboard, KeyboardButton }
 import ru.finagram.util.Spec
 
@@ -18,20 +17,26 @@ class KeyboardSpec extends Spec {
 
     it("should build selective keyboard") {
       // when:
-      val keyboard = new Keyboard(selective).create()
+      val keyboard = new Keyboard()
+        .selective()
+        .create()
       // then:
-      keyboard.selective should contain (true)
+      keyboard.selective should contain(true)
       keyboard.oneTimeKeyboard should be(None)
       keyboard.resizeKeyboard should be(None)
     }
 
     it("should build selective, oneTime and resizable keyboard") {
       // when:
-      val keyboard = new Keyboard(selective, oneTime, resize).create()
+      val keyboard = new Keyboard()
+        .selective()
+        .oneTime()
+        .resize()
+        .create()
       // then:
-      keyboard.selective should contain (true)
-      keyboard.oneTimeKeyboard should contain (true)
-      keyboard.resizeKeyboard should contain (true)
+      keyboard.selective should contain(true)
+      keyboard.oneTimeKeyboard should contain(true)
+      keyboard.resizeKeyboard should contain(true)
     }
   }
 
@@ -40,7 +45,7 @@ class KeyboardSpec extends Spec {
       // when:
       val keyboard = new Keyboard().buttons("1", "2", "3").create()
       // then:
-      keyboard.keyboard should have size(1)
+      keyboard.keyboard should have size (1)
       keyboard.keyboard.head should contain allOf(
         KeyboardButton("1"),
         KeyboardButton("2"),
@@ -53,7 +58,7 @@ class KeyboardSpec extends Spec {
         .buttons("4")
         .create()
       // then:
-      keyboard.keyboard should have size(2)
+      keyboard.keyboard should have size (2)
       keyboard.keyboard.head should contain allOf(
         KeyboardButton("1"),
         KeyboardButton("2"),
