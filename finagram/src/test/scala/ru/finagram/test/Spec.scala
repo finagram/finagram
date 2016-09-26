@@ -1,4 +1,4 @@
-package ru.finagram.util
+package ru.finagram.test
 
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{ Request, Response }

@@ -3,8 +3,8 @@ import com.twitter.util.{ Await, Future }
 import org.mockito.Mockito._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
-import ru.finagram.util.RandomObjects._
-import ru.finagram.util.Spec
+import ru.finagram.test.RandomObjects._
+import ru.finagram.test.{ Spec, TestException }
 
 class PollingSpec extends Spec {
 
@@ -32,7 +32,7 @@ class PollingSpec extends Spec {
       val client = mock[TelegramClient]
       doReturn(Future(updates.result)).when(client).getUpdates(any[String], any[Long], any[Option[Int]])
       doReturn(Future.Unit).when(client).sendAnswer(any[String], any[Answer])
-      val polling = spy(new TestPolling(randomString(), client, (_) => throw new Exception("On handle message example exception")))
+      val polling = spy(new TestPolling(randomString(), client, (_) => throw new TestException("On handle message example exception")))
 
       // when:
       Await result polling.poll(0)

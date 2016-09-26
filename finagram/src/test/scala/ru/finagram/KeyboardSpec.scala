@@ -1,7 +1,7 @@
 package ru.finagram
 
 import ru.finagram.api.{ Keyboard, KeyboardButton }
-import ru.finagram.util.Spec
+import ru.finagram.test.Spec
 
 class KeyboardSpec extends Spec {
 

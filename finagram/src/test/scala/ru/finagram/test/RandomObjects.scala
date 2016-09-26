@@ -1,4 +1,4 @@
-package ru.finagram.util
+package ru.finagram.test
 
 import ru.finagram.api._
 

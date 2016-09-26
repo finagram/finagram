@@ -3,7 +3,7 @@ package ru.finagram.api
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.json4s.JsonAST._
 import org.json4s.native.Serialization
-import ru.finagram.util.Spec
+import ru.finagram.test.Spec
 
 import scala.math.BigInt
 import scala.util.Random
