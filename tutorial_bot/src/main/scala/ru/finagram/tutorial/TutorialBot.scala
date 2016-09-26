@@ -3,7 +3,6 @@ package ru.finagram.tutorial
 import com.twitter.util.Future
 import ru.finagram.{ FinagramBot, Polling }
 import ru.finagram.Answers._
-import ru.finagram.api.Keyboard.{ oneTime, resize }
 import ru.finagram.api._
 
 object TutorialBot extends App with FinagramBot with ClientDescription with Polling {
