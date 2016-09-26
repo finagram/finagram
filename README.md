@@ -15,10 +15,4 @@ Bot for Telegram on Finagle
   * [ ] Photo
   * [ ] Sticker
 * [x] Implement support of the keyboards  
-* [ ] Implement support of the inline mode
-* [ ] Implement tutorial bot with chapters about send answer supported types:
-  * [x] Text
-  * [ ] File
-  * [ ] Photo
-  * [ ] Sticker
-* [ ] Select and add license  
+* [x] Select and add license  
