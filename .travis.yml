@@ -1,6 +1,6 @@
 language: scala
 scala:
-   - 2.11.7
+   - 2.11.8
 branches:
     - master
     - develop
@@ -9,5 +9,4 @@ notifications:
     recipients:
       - vladimir@dokwork.ru
 jdk:
-  - oraclejdk7
   - oraclejdk8
