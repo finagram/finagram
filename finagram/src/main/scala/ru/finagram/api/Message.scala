@@ -71,8 +71,6 @@ case class Sticker(
 /**
  * Document.
  *
- * This object represents a general file (as opposed to photos and audio files).
- *
  * @param fileId 	  Unique file identifier
  * @param thumb 	  Document thumbnail as defined by sender
  * @param fileName  Original filename as defined by sender
@@ -85,6 +83,17 @@ case class Document(
   fileName : Option[String] = None,
   mimeType : Option[String] = None,
   fileSize : Option[Int] = None
+)
+
+/**
+ * Location.
+ *
+ * @param longitude  Longitude as defined by sender
+ * @param latitude   Latitude as defined by sender
+ */
+case class Location(
+  longitude : Double,
+  latitude  : Double
 )
 
 /**
@@ -111,3 +120,5 @@ case class TextMessage(messageId: Long, from: Option[User], date: Long, chat: Ch
 case class StickerMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, sticker: Sticker) extends Message
 
 case class DocumentMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, document: Document) extends Message
+
+case class LocationMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, location: Location) extends Message
