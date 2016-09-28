@@ -17,7 +17,12 @@ object TelegramResponse {
     val json = parse(content).camelizeKeys
     val ok = (json \ "ok").extract[Boolean]
     if (ok) {
-      json.extract[Updates]
+      (json \ "result") match {
+        case _: JArray =>
+          json.extract[Updates]
+        case _: JObject =>
+          json.extract[FileResponse]
+      }
     } else {
       json.extract[TelegramException]
     }
@@ -41,6 +46,10 @@ case class TelegramException(description: String, errorCode: Option[Int])
  * @param result updates from Telegram.
  */
 case class Updates(result: Seq[Update]) extends TelegramResponse {
+  val ok = true
+}
+
+case class FileResponse(result: File) extends TelegramResponse {
   val ok = true
 }
 

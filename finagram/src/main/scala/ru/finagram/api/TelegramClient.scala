@@ -34,7 +34,8 @@ class TelegramClient(http: Service[Request, Response] = Http.client
   def getUpdates(token: String, offset: Long, limit: Option[Int] = None): Future[Seq[Update]] = {
     http(createUpdateRequest(token, offset, limit))
       .map(verifyResponseStatus)
-      .map(extractUpdatesFromResponse)
+      .map(extractFromResponse[Updates])
+      .map(_.result)
   }
 
   /**
@@ -68,12 +69,11 @@ class TelegramClient(http: Service[Request, Response] = Http.client
    * @throws TelegramException when response is not ok (field 'ok' is false).
    * @throws UnexpectedResponseException when parsing of the response was failed.
    */
-  private def extractUpdatesFromResponse(response: Response): Seq[Update] = {
+  private def extractFromResponse[T](response: Response): T = {
     val content = response.contentString
     log.trace(s"Received content: $content")
     Try(TelegramResponse(content)) match {
-      case Return(Updates(result)) =>
-        log.trace(s"Received ${result.size} updates")
+      case Return(result: T) =>
         result
       case Return(e: TelegramException) =>
         throw e
@@ -91,17 +91,12 @@ class TelegramClient(http: Service[Request, Response] = Http.client
   def getFile(token: String, fileId: String): Future[File] = {
     http(createGetFileRequest(token, fileId))
       .map(verifyResponseStatus)
-      .map(extractFileFromResponse)
+      .map(extractFromResponse[File])
   }
 
   private def createGetFileRequest(token: String, fileId: String): Request = {
     val path = s"/bot$token/getFile?file_id=$fileId"
     Request(Method.Get, path)
-  }
-
-  private def extractFileFromResponse(response: Response): File = {
-    val json = parse(response.contentString).camelizeKeys
-    json.extract[File]
   }
 
   /**
