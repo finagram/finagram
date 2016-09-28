@@ -91,7 +91,8 @@ class TelegramClient(http: Service[Request, Response] = Http.client
   def getFile(token: String, fileId: String): Future[File] = {
     http(createGetFileRequest(token, fileId))
       .map(verifyResponseStatus)
-      .map(extractFromResponse[File])
+      .map(extractFromResponse[FileResponse])
+      .map(_.result)
   }
 
   private def createGetFileRequest(token: String, fileId: String): Request = {
