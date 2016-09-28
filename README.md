@@ -1,7 +1,19 @@
-# finagram
-Bot for Telegram on Finagle
+# Finagram
+This library makes develop bots for Telegram easy. Main idea is declaration of the handlers for commands in [Finatra](http://twitter.github.io/finatra/) style. 
 
-## DoD for first alpha version
+_This is early version that not ready for use._
+
+## Simple example
+
+## Polling or Webhooks
+
+## Multiple handlers declaration
+
+## Telegram client
+
+## Telegram api
+
+## TODO
 * [x] Implement support of the polling
 * [ ] Implement support of the webhook
 * Implement support for send messages of types:
@@ -13,6 +25,5 @@ Bot for Telegram on Finagle
   * [x] Text
   * [ ] File
   * [ ] Photo
-  * [ ] Sticker
-* [x] Implement support of the keyboards  
-* [x] Select and add license  
+  * [x] Sticker
+* [x] Implement support of the keyboards (include inline)
