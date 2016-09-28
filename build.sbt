@@ -6,7 +6,7 @@ lazy val finagram = (project in file("finagram"))
   .settings(
     Seq(
       name := "finagram",
-      version := "0.0.1",
+      version := "0.1.0",
       organization := "ru.finagram",
       scalaVersion := "2.11.8",
       libraryDependencies ++= Seq(
