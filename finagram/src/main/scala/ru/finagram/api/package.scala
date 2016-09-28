@@ -89,7 +89,7 @@ package object api {
   case class Location(
     longitude : Double,
     latitude  : Double
-  ) extends IFile
+  )
 
   /**
    * Video.
