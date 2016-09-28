@@ -1,4 +1,4 @@
-# Finagram
+# Finagram [![Build Status](https://travis-ci.org/finagram/finagram.svg?branch=master)](https://travis-ci.org/finagram/finagram)
 This library makes develop bots for Telegram easy. Main idea is declaration of the handlers for commands in [Finatra](http://twitter.github.io/finatra/) style. 
 
 _This is early version that not ready for use._
