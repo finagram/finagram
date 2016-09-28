@@ -1,6 +1,7 @@
 package ru.finagram
 
 package object api {
+
   /**
    * This class represents a Telegram user or bot.
    *
@@ -73,11 +74,11 @@ package object api {
    * @param fileSize  File size
    */
   case class Document(
-    fileId   : String,
-    thumb    : Option[PhotoSize] = None,
-    fileName : Option[String] = None,
-    mimeType : Option[String] = None,
-    fileSize : Option[Int] = None
+    fileId: String,
+    thumb: Option[PhotoSize] = None,
+    fileName: Option[String] = None,
+    mimeType: Option[String] = None,
+    fileSize: Option[Int] = None
   ) extends IFile
 
   /**
@@ -87,8 +88,8 @@ package object api {
    * @param latitude   Latitude as defined by sender
    */
   case class Location(
-    longitude : Double,
-    latitude  : Double
+    longitude: Double,
+    latitude: Double
   )
 
   /**
@@ -103,13 +104,13 @@ package object api {
    * @param fileSize  File size.
    */
   case class Video(
-    fileId   : String,
-    width    : Int,
-    height   : Int,
-    duration : Int,
-    thumb    : Option[PhotoSize] = None,
-    mimeType : Option[String] = None,
-    fileSize : Option[Int] = None
+    fileId: String,
+    width: Int,
+    height: Int,
+    duration: Int,
+    thumb: Option[PhotoSize] = None,
+    mimeType: Option[String] = None,
+    fileSize: Option[Int] = None
   ) extends IFile
 
   /**
@@ -121,9 +122,19 @@ package object api {
    * @param fileSize  File size.
    */
   case class Voice(
-    fileId   : String,
-    duration : Int,
-    mimeType : Option[String],
-    fileSize : Option[Int]
+    fileId: String,
+    duration: Int,
+    mimeType: Option[String],
+    fileSize: Option[Int]
   ) extends IFile
+
+  /**
+   * File.
+   *
+   * @param fileId	  Unique identifier for this file
+   * @param fileSize	File size, if known
+   * @param filePath	File path. https://api.telegram.org/file/bot<token>/<filePath>.
+   */
+  case class File(fileId: String, fileSize: Option[Int], filePath: Option[String])
+
 }

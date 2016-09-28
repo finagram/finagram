@@ -26,7 +26,8 @@ trait Polling extends MessageReceiver {
     case e => log.error("Not handled exception:", e)
   }
 
-  private[finagram] val client = new TelegramClient()
+  // FIXME revert private[finagram]
+  protected val client = new TelegramClient()
 
   /**
    * Timeout between requests.

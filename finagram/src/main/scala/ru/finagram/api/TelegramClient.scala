@@ -3,15 +3,15 @@ package ru.finagram.api
 import com.twitter.finagle.http.{ Method, Request, Response }
 import com.twitter.finagle.{ Http, Service }
 import com.twitter.util.{ Future, Return, Throw, Try }
+import org.json4s.DefaultFormats
 import org.json4s.native.JsonMethods._
-import org.json4s.{ DefaultFormats, Extraction }
 import org.slf4j.LoggerFactory
 import ru.finagram.UnexpectedResponseException
 
 /**
  * Contains methods for issue http requests to Telegram.
  */
-class TelegramClient private[finagram] (http: Service[Request, Response] = Http.client
+class TelegramClient private[finagram](http: Service[Request, Response] = Http.client
   .withTls("api.telegram.org")
   .newService("api.telegram.org:443")
 ) {
@@ -32,7 +32,7 @@ class TelegramClient private[finagram] (http: Service[Request, Response] = Http.
    * @return
    */
   def getUpdates(token: String, offset: Long, limit: Option[Int] = None): Future[Seq[Update]] = {
-    http(getUpdateRequest(token, offset, limit))
+    http(createUpdateRequest(token, offset, limit))
       .map(verifyResponseStatus)
       .map(extractUpdatesFromResponse)
   }
@@ -51,8 +51,8 @@ class TelegramClient private[finagram] (http: Service[Request, Response] = Http.
    * @param offset number of the last handled update.
    * @return http request
    */
-  private def getUpdateRequest(token: String, offset: Long, limit: Option[Int] = None): Request = {
-    val path = if(limit.isEmpty ) {
+  private def createUpdateRequest(token: String, offset: Long, limit: Option[Int] = None): Request = {
+    val path = if (limit.isEmpty) {
       s"/bot$token/getUpdates?offset=$offset"
     } else {
       s"/bot$token/getUpdates?offset=$offset&limit=${limit.get}"
@@ -80,6 +80,28 @@ class TelegramClient private[finagram] (http: Service[Request, Response] = Http.
       case Throw(e) =>
         throw new UnexpectedResponseException("Parse response failed.", e)
     }
+  }
+
+  /**
+   * Method to get basic info about a file and prepare it for downloading.
+   *
+   * @param token
+   * @param fileId
+   */
+  def getFile(token: String, fileId: String): Future[File] = {
+    http(createGetFileRequest(token, fileId))
+      .map(verifyResponseStatus)
+      .map(extractFileFromResponse)
+  }
+
+  private def createGetFileRequest(token: String, fileId: String): Request = {
+    val path = s"/bot$token/getFile?file_id=$fileId"
+    Request(Method.Get, path)
+  }
+
+  private def extractFileFromResponse(response: Response): File = {
+    val json = parse(response.contentString).camelizeKeys
+    json.extract[File]
   }
 
   /**
