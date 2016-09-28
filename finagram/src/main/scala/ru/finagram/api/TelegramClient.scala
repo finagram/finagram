@@ -11,7 +11,7 @@ import ru.finagram.UnexpectedResponseException
 /**
  * Contains methods for issue http requests to Telegram.
  */
-class TelegramClient private[finagram](http: Service[Request, Response] = Http.client
+class TelegramClient(http: Service[Request, Response] = Http.client
   .withTls("api.telegram.org")
   .newService("api.telegram.org:443")
 ) {
