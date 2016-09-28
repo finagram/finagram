@@ -11,6 +11,12 @@ object MessageSerializer extends Serializer[Message] {
   override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Message] = {
     case (TypeInfo(MessageClass, _), json: JObject) =>
       json.values match {
+        case v if v.contains("video") =>
+          json.extract[VideoMessage]
+        case v if v.contains("voice") =>
+          json.extract[VoiceMessage]
+        case v if v.contains("photo") =>
+          json.extract[PhotoMessage]
         case v if v.contains("location") =>
           json.extract[LocationMessage]
         case v if v.contains("document") =>
@@ -25,6 +31,12 @@ object MessageSerializer extends Serializer[Message] {
   }
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
+    case m: VideoMessage =>
+      JMessage(m) ~~ ("video" -> json(m.video))
+    case m: VoiceMessage =>
+      JMessage(m) ~~ ("voice" -> json(m.voice))
+    case m: PhotoMessage =>
+      JMessage(m) ~~ ("photo" -> json(m.photo))
     case m: DocumentMessage =>
       JMessage(m) ~~ ("location" -> json(m.document))
     case m: DocumentMessage =>

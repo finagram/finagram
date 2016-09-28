@@ -11,92 +11,6 @@ sealed trait Message {
 }
 
 /**
- * This class represents a Telegram user or bot.
- *
- * @param id		      Unique identifier for this user or bot.
- * @param firstName		User‘s or bot’s first name.
- * @param lastName	  User‘s or bot’s last name.
- * @param username	  User‘s or bot’s username.
- */
-case class User(id: Int, firstName: String, lastName: Option[String] = None, username: Option[String] = None)
-
-/**
- * This class represents a chat.
- *
- * @param id        Unique identifier for this chat.
- * @param type      Type of chat, can be either “private”, “group”, “supergroup” or “channel”.
- * @param title     Optional. Title, for channels and group chats.
- * @param username  Optional. Username, for private chats, supergroups and channels if available.
- * @param firstName Optional. First name of the other party in a private chat.
- * @param lastName  Optional. Last name of the other party in a private chat.
- */
-case class Chat(
-  id: Long,
-  `type`: String,
-  title: Option[String] = None,
-  firstName: Option[String] = None,
-  lastName: Option[String] = None,
-  username: Option[String] = None
-)
-
-/**
- * This class represents one size of a photo or a file / sticker thumbnail.
- *
- * @param fileId Unique identifier for this file.
- * @param width Photo width.
- * @param height Photo height.
- * @param fileSize File size.
- */
-case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[Int])
-
-/**
- * Sticker.
- *
- * @param fileId Unique identifier for this file.
- * @param width Sticker width.
- * @param height Sticker height.
- * @param thumb Sticker thumbnail in .webp or .jpg format.
- * @param emoji Emoji associated with the sticker.
- * @param fileSize File size.
- */
-case class Sticker(
-  fileId: String,
-  width: Int,
-  height: Int,
-  thumb: Option[PhotoSize],
-  emoji: Option[String],
-  fileSize: Option[Int]
-)
-
-/**
- * Document.
- *
- * @param fileId 	  Unique file identifier
- * @param thumb 	  Document thumbnail as defined by sender
- * @param fileName  Original filename as defined by sender
- * @param mimeType  MIME type of the file as defined by sender
- * @param fileSize  File size
- */
-case class Document(
-  fileId   : String,
-  thumb    : Option[PhotoSize] = None,
-  fileName : Option[String] = None,
-  mimeType : Option[String] = None,
-  fileSize : Option[Int] = None
-)
-
-/**
- * Location.
- *
- * @param longitude  Longitude as defined by sender
- * @param latitude   Latitude as defined by sender
- */
-case class Location(
-  longitude : Double,
-  latitude  : Double
-)
-
-/**
  * Text message.
  *
  * @param messageId	Integer	Unique message identifier.
@@ -122,3 +36,9 @@ case class StickerMessage(messageId: Long, from: Option[User], date: Long, chat:
 case class DocumentMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, document: Document) extends Message
 
 case class LocationMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, location: Location) extends Message
+
+case class PhotoMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, photo: List[PhotoSize], text: Option[String]) extends Message
+
+case class VideoMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, video: Video) extends Message
+
+case class VoiceMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, voice: Voice) extends Message
