@@ -11,20 +11,24 @@ object MessageSerializer extends Serializer[Message] {
   override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Message] = {
     case (TypeInfo(MessageClass, _), json: JObject) =>
       json.values match {
-        case v if v.contains("text") =>
-          json.extract[TextMessage]
+        case v if v.contains("document") =>
+          json.extract[DocumentMessage]
         case v if v.contains("sticker") =>
           json.extract[StickerMessage]
+        case v if v.contains("text") =>
+          json.extract[TextMessage]
         case _ =>
           ???
       }
   }
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
-    case m: TextMessage =>
-      JMessage(m) ~~ ("text" -> m.text)
+    case m: DocumentMessage =>
+      JMessage(m) ~~ ("document" -> json(m.document))
     case m: StickerMessage =>
       JMessage(m) ~~ ("sticker" -> json(m.sticker))
+    case m: TextMessage =>
+      JMessage(m) ~~ ("text" -> m.text)
   }
 
   private def JMessage(m: Message): JObject = {

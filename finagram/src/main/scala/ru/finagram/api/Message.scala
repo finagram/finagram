@@ -1,8 +1,5 @@
 package ru.finagram.api
 
-import org.json4s.{ DefaultFormats, Formats, JValue, Serializer, TypeInfo }
-import org.json4s.JsonAST.JObject
-
 /**
  * This trait represents a message.
  */
@@ -53,7 +50,7 @@ case class Chat(
 case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[Int])
 
 /**
- * This class represents a sticker.
+ * Sticker.
  *
  * @param fileId Unique identifier for this file.
  * @param width Sticker width.
@@ -62,7 +59,33 @@ case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[I
  * @param emoji Emoji associated with the sticker.
  * @param fileSize File size.
  */
-case class Sticker(fileId: String, width: Int, height: Int, thumb: Option[PhotoSize], emoji: Option[String], fileSize: Option[Int])
+case class Sticker(
+  fileId: String,
+  width: Int,
+  height: Int,
+  thumb: Option[PhotoSize],
+  emoji: Option[String],
+  fileSize: Option[Int]
+)
+
+/**
+ * Document.
+ *
+ * This object represents a general file (as opposed to photos and audio files).
+ *
+ * @param fileId 	  Unique file identifier
+ * @param thumb 	  Document thumbnail as defined by sender
+ * @param fileName  Original filename as defined by sender
+ * @param mimeType  MIME type of the file as defined by sender
+ * @param fileSize  File size
+ */
+case class Document(
+  fileId   : String,
+  thumb    : Option[PhotoSize] = None,
+  fileName : Option[String] = None,
+  mimeType : Option[String] = None,
+  fileSize : Option[Int] = None
+)
 
 /**
  * Text message.
@@ -83,5 +106,8 @@ case class TextMessage(messageId: Long, from: Option[User], date: Long, chat: Ch
  * @param date    	Date the message was sent in Unix time.
  * @param chat 	    Conversation the message belongs to.
  * @param sticker   Information about the sticker.
+ * @param text      The actual UTF-8 text of the message, 0-4096 characters.
  */
 case class StickerMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, sticker: Sticker) extends Message
+
+case class DocumentMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, document: Document) extends Message
