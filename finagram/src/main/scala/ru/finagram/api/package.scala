@@ -40,6 +40,10 @@ package object api {
    */
   case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[Int])
 
+  trait IFile {
+    val fileId: String
+  }
+
   /**
    * Sticker.
    *
@@ -57,7 +61,7 @@ package object api {
     thumb: Option[PhotoSize],
     emoji: Option[String],
     fileSize: Option[Int]
-  )
+  ) extends IFile
 
   /**
    * Document.
@@ -74,7 +78,7 @@ package object api {
     fileName : Option[String] = None,
     mimeType : Option[String] = None,
     fileSize : Option[Int] = None
-  )
+  ) extends IFile
 
   /**
    * Location.
@@ -85,7 +89,7 @@ package object api {
   case class Location(
     longitude : Double,
     latitude  : Double
-  )
+  ) extends IFile
 
   /**
    * Video.
@@ -106,7 +110,7 @@ package object api {
     thumb    : Option[PhotoSize] = None,
     mimeType : Option[String] = None,
     fileSize : Option[Int] = None
-  )
+  ) extends IFile
 
   /**
    * Voice
@@ -121,5 +125,5 @@ package object api {
     duration : Int,
     mimeType : Option[String],
     fileSize : Option[Int]
-  )
+  ) extends IFile
 }
