@@ -34,11 +34,24 @@ trait Polling extends MessageReceiver {
    */
   val timeout = Duration(700, TimeUnit.MILLISECONDS)
 
+  @volatile
+  private var isStarted = false
+  private val isStoped = Promise[Unit]
+
   /**
    * Run process of get updates from Telegram.
    */
   override final def run(): Unit = {
+    isStarted = true
     Await result repeat(poll, 0L)
+    isStoped.setDone()
+  }
+
+  /**
+   * Stop process of get updates from Telegram.
+   */
+  final def stop(): Future[Unit] = {
+    isStoped
   }
 
   def handleError: PartialFunction[Throwable, Unit] = defaultErrorHandler
@@ -101,12 +114,16 @@ trait Polling extends MessageReceiver {
    * @tparam T type of action result.
    * @return last invoked future.
    */
-  private def repeat[T](action: (T) => Future[T], init: T): Future[T] = {
-    action(init).delayed(timeout)(timer).transform {
-      case Return(result) =>
-        repeat(action, result)
-      case Throw(e) =>
-        repeat(action, init)
+  private def repeat[T](action: (T) => Future[T], init: T): Future[Unit] = {
+    if (isStarted) {
+      action(init).delayed(timeout)(timer).transform {
+        case Return(result) =>
+          repeat(action, result)
+        case Throw(e) =>
+          repeat(action, init)
+      }
+    } else {
+      Future.Unit
     }
   }
 }
