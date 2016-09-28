@@ -51,7 +51,8 @@ trait Polling extends MessageReceiver {
    * Stop process of get updates from Telegram.
    */
   final def stop(): Future[Unit] = {
-    isStoped
+    isStarted = false
+    client.close().join(isStoped).unit
   }
 
   def handleError: PartialFunction[Throwable, Unit] = defaultErrorHandler
