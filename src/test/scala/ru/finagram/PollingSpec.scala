@@ -63,7 +63,6 @@ class PollingSpec extends Spec {
     override val client: TelegramClient = mock[TelegramClient],
     answer: (Update) => Answer
   ) extends Polling {
-    override val log: Logger = PollingSpec.this.log
     override def handle(update: Update): Future[Option[Answer]] = {
       log.info(s"$update")
       Future {

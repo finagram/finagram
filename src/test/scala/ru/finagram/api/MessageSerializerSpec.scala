@@ -69,4 +69,14 @@ class MessageSerializerSpec extends Spec {
       }
     }
   }
+
+  describe(s"deserialize ${classOf[Message]} from json string") {
+    it(s"should deserialize ${classOf[DocumentMessage]}") {
+      // given:
+
+      // when:
+
+      // then:
+    }
+  }
 }

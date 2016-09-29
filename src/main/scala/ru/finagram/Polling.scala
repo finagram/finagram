@@ -2,17 +2,18 @@ package ru.finagram
 
 import java.util.concurrent.TimeUnit
 
-import com.twitter.finagle.http.{ Message => _ }
 import com.twitter.util._
-import org.slf4j.Logger
+import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
 
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
  */
 trait Polling extends MessageReceiver {
-  val token: String
-  val log: Logger
+
+  protected val token: String
+
+  private val log: Logger = LoggerFactory.getLogger(getClass)
 
   /**
    * Timer for repeat [[poll]]
@@ -33,11 +34,25 @@ trait Polling extends MessageReceiver {
    */
   val timeout = Duration(700, TimeUnit.MILLISECONDS)
 
+  @volatile
+  private var isStarted = false
+  private val isStoped = Promise[Unit]
+
   /**
    * Run process of get updates from Telegram.
    */
   override final def run(): Unit = {
+    isStarted = true
     Await result repeat(poll, 0L)
+    isStoped.setDone()
+  }
+
+  /**
+   * Stop process of get updates from Telegram.
+   */
+  final def stop(): Future[Unit] = {
+    isStarted = false
+    client.close().join(isStoped).unit
   }
 
   def handleError: PartialFunction[Throwable, Unit] = defaultErrorHandler
@@ -63,18 +78,17 @@ trait Polling extends MessageReceiver {
    * @return next offset.
    */
   private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Option[Long]] = {
-    Future.collect {
-      updates.map { update =>
-        takeAnswerFor(update)
-          .flatMap {
-            case Some(answer) =>
-              client.sendAnswer(token, answer)
-            case None =>
-              Future.Done
-          }
-          .map(_ => update.updateId + 1)
-      }
-    }.map(_.lastOption)
+    val iterator = updates.iterator
+    Future.whileDo(iterator.hasNext) {
+      val update = iterator.next()
+      takeAnswerFor(update)
+        .flatMap {
+          case Some(answer) =>
+            client.sendAnswer(token, answer)
+          case None =>
+            Future.Done
+        }
+    }.map(_ => updates.lastOption.map(_.updateId + 1))
   }
 
   /**
@@ -100,12 +114,16 @@ trait Polling extends MessageReceiver {
    * @tparam T type of action result.
    * @return last invoked future.
    */
-  private def repeat[T](action: (T) => Future[T], init: T): Future[T] = {
-    action(init).delayed(timeout)(timer).transform {
-      case Return(result) =>
-        repeat(action, result)
-      case Throw(e) =>
-        repeat(action, init)
+  private def repeat[T](action: (T) => Future[T], init: T): Future[Unit] = {
+    if (isStarted) {
+      action(init).delayed(timeout)(timer).transform {
+        case Return(result) =>
+          repeat(action, result)
+        case Throw(e) =>
+          repeat(action, init)
+      }
+    } else {
+      Future.Unit
     }
   }
 }
