@@ -126,7 +126,7 @@ class TelegramClient(http: Service[Request, Response] = Http.client
     http(postAnswer(token, answer))
       .onSuccess(response => log.debug("Response to answer:\n" + response.contentString))
       .map(verifyResponseStatus)
-      .map(_ => Unit)
+      .unit
   }
 
   /**

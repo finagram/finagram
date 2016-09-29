@@ -78,18 +78,17 @@ trait Polling extends MessageReceiver {
    * @return next offset.
    */
   private def handleUpdatesAndExtractNewOffset(updates: Seq[Update]): Future[Option[Long]] = {
-    Future.collect {
-      updates.map { update =>
-        takeAnswerFor(update)
-          .flatMap {
-            case Some(answer) =>
-              client.sendAnswer(token, answer)
-            case None =>
-              Future.Done
-          }
-          .map(_ => update.updateId + 1)
-      }
-    }.map(_.lastOption)
+    val iterator = updates.iterator
+    Future.whileDo(iterator.hasNext) {
+      val update = iterator.next()
+      takeAnswerFor(update)
+        .flatMap {
+          case Some(answer) =>
+            client.sendAnswer(token, answer)
+          case None =>
+            Future.Done
+        }
+    }.map(_ => updates.lastOption.map(_.updateId + 1))
   }
 
   /**
