@@ -2,17 +2,18 @@ package ru.finagram
 
 import java.util.concurrent.TimeUnit
 
-import com.twitter.finagle.http.{ Message => _ }
 import com.twitter.util._
-import org.slf4j.Logger
+import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
 
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.
  */
 trait Polling extends MessageReceiver {
-  val token: String
-  val log: Logger
+
+  protected val token: String
+
+  private val log: Logger = LoggerFactory.getLogger(getClass)
 
   /**
    * Timer for repeat [[poll]]
@@ -26,8 +27,7 @@ trait Polling extends MessageReceiver {
     case e => log.error("Not handled exception:", e)
   }
 
-  // FIXME revert private[finagram]
-  protected val client = new TelegramClient()
+  private[finagram] val client = new TelegramClient()
 
   /**
    * Timeout between requests.
