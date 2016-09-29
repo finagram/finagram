@@ -11,9 +11,10 @@ import ru.finagram.UnexpectedResponseException
 /**
  * Contains methods for issue http requests to Telegram.
  */
-class TelegramClient(http: Service[Request, Response] = Http.client
-  .withTls("api.telegram.org")
-  .newService("api.telegram.org:443")
+class TelegramClient(
+  http: Service[Request, Response] = Http.client
+    .withTls("api.telegram.org")
+    .newService("api.telegram.org:443")
 ) {
 
   private val log = LoggerFactory.getLogger(getClass)
@@ -141,11 +142,12 @@ class TelegramClient(http: Service[Request, Response] = Http.client
     log.trace(s"Prepared answer $content")
 
     val request = answer match {
-      case txt: TextAnswer =>
+      case _: TextAnswer =>
         Request(Method.Post, s"/bot$token/sendMessage")
-      case sticker: StickerAnswer =>
+      case _: StickerAnswer =>
         Request(Method.Post, s"/bot$token/sendSticker")
-      case a => throw new NotImplementedError(s"Not implemented post answer for $a")
+      case a =>
+        throw new NotImplementedError(s"Not implemented post answer for $a")
     }
     request.setContentTypeJson()
     request.contentString = content
