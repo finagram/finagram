@@ -29,6 +29,7 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
   on("/keyboard") {
     val keyboard = new Keyboard()
       .resize()
+      .oneTime()
       .buttons("1", "2", "3")
       .buttons("4", "5", "6")
       .create()

@@ -1,19 +1,32 @@
 package ru.finagram.api
 
+import java.util.UUID
+
 import org.json4s.JsonAST.{ JObject, _ }
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import ru.finagram.test.Spec
+import uk.co.jemos.podam.api.{ AbstractRandomDataProviderStrategy, AttributeMetadata, PodamFactoryImpl }
 
 class MessageSerializerSpec extends Spec {
 
   implicit val formats = DefaultFormats + MessageSerializer
 
-  describe("serialize message to json") {
+  override val factory = new PodamFactoryImpl(UUIDStringProviderStrategy)
+
+  val randomTextMessage = random[TextMessage]
+  val randomDocumentMessage = random[DocumentMessage]
+  val randomLocationMessage = random[LocationMessage]
+  val randomStickerMessage = random[StickerMessage]
+  val randomVideoMessage = random[VideoMessage]
+  val randomPhotoMessage = random[PhotoMessage]
+  val randomVoiceMessage = random[VoiceMessage]
+
+  ignore("serialize message to json") {
     it(s"should create JObject for text message only with expected fields") {
       // given:
-      val msg = random[TextMessage]
+      val msg = randomTextMessage
 
       // when:
       val json = Extraction.decompose(msg).snakizeKeys
@@ -50,12 +63,12 @@ class MessageSerializerSpec extends Spec {
     }
     val messages = Table[Message, String, Class[_ <: JValue]](
       ("Message", "Expected custom field", ""),
-      (random[DocumentMessage], "document", classOf[JObject]),
-      (random[LocationMessage], "location", classOf[JObject]),
-      (random[StickerMessage], "sticker", classOf[JObject]),
-      (random[VideoMessage], "video", classOf[JObject]),
-      (random[PhotoMessage], "photo", classOf[JArray]),
-      (random[VoiceMessage], "voice", classOf[JObject])
+      (randomDocumentMessage, "document", classOf[JObject]),
+      (randomLocationMessage, "location", classOf[JObject]),
+      (randomStickerMessage, "sticker", classOf[JObject]),
+      (randomVideoMessage, "video", classOf[JObject]),
+      (randomPhotoMessage, "photo", classOf[JArray]),
+      (randomVoiceMessage, "voice", classOf[JObject])
     )
     forAll(messages) { (msg, field, clazz) =>
       it(s"should create expected JObject with field $field") {
@@ -81,12 +94,53 @@ class MessageSerializerSpec extends Spec {
   }
 
   describe(s"deserialize ${classOf[Message]} from json string") {
-    it(s"should deserialize ${classOf[DocumentMessage]}") {
-      // given:
 
-      // when:
+    val messages = Table[Message, String, String, (JValue) => Message](
+      ("Message", "Content field name", "Content field value", "Class"),
+//      (randomTextMessage, "text", s""""${randomTextMessage.text}"""", (json: JValue) => json.extract[TextMessage]),
+      (randomDocumentMessage, "document", write(randomDocumentMessage.document), (json: JValue) => json.extract[DocumentMessage])
+    )
 
-      // then:
+
+    forAll(messages) { (message, fieldName, fieldValue, extract) =>
+      it(s"should deserialize ${message.getClass}") {
+        // given:
+        val str =
+          s"""
+             |{
+             |   "message_id":${message.messageId},
+             |   "from":${write(message.from)},
+             |   "chat":${write(message.chat)},
+             |   "date":${message.date},
+             |   "$fieldName":$fieldValue
+             |}
+        """.stripMargin
+        println(str)
+
+        // when:
+        val actualMessage = extract(parse(str).camelizeKeys)
+
+        // then:
+        actualMessage should be(message)
+      }
     }
   }
+
+  private def write(obj: AnyRef): String = compact(render(Extraction.decompose(obj).snakizeKeys))
 }
+
+object UUIDStringProviderStrategy extends AbstractRandomDataProviderStrategy {
+  override def getStringValue(attributeMetadata: AttributeMetadata): String = UUID.randomUUID().toString
+
+  override def getInteger(attributeMetadata: AttributeMetadata): Integer = 42
+}
+
+object Test extends App {
+  val factory = new PodamFactoryImpl()
+
+  factory.manufacturePojoWithFullData(
+    classOf[Option[Int]]
+  )
+}
+
+class A { val a = Some(42)}

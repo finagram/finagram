@@ -9,13 +9,14 @@ import org.mockito.{ ArgumentCaptor, Mockito }
 import org.scalatest.words.ShouldVerb
 import org.scalatest.{ FunSpecLike, Matchers }
 import uk.co.jemos.podam.api.PodamFactoryImpl
+import uk.co.jemos.podam.common.AttributeStrategy
 
 import scala.concurrent.duration._
 import scala.reflect.{ ClassTag, Manifest }
 
 trait Spec extends FunSpecLike with Matchers with ShouldVerb {
 
-  private val factory = new PodamFactoryImpl()
+  protected val factory = new PodamFactoryImpl()
 
   def random[T <: AnyRef](implicit classTag: ClassTag[T]): T = {
     factory.manufacturePojoWithFullData(
