@@ -5,17 +5,18 @@ import com.twitter.util.Await
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
-import ru.finagram.test.RandomObjects._
 import ru.finagram.test.Spec
+
+import scala.util.Random
 
 class TelegramClientSpec extends Spec {
 
   describe("get updates") {
     it("should issue GET to /bot<token>/getUpdates with offset and limit") {
       // given:
-      val token = randomString()
-      val offset = randomInt()
-      val limit = randomInt()
+      val token = Random.nextString(10)
+      val offset = Random.nextInt(100)
+      val limit = Random.nextInt(5)
       val http = clientWithResponse(responseWithContent(toJsonString(randomUpdatesWithMessage(0))))
       val client = new TelegramClient(http)
 
@@ -37,5 +38,10 @@ class TelegramClientSpec extends Spec {
     implicit val formats = DefaultFormats + FieldSerializer[TelegramResponse]()
     val str = compact(render(Extraction.decompose(updates).snakizeKeys))
     str
+  }
+
+  private def randomUpdatesWithMessage(count: Int): Updates = {
+    val k = Random.nextInt(100)
+    Updates((1 to count).map(i => random[MessageUpdate].copy(updateId = i * k)))
   }
 }

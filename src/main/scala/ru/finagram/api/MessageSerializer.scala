@@ -37,8 +37,8 @@ object MessageSerializer extends Serializer[Message] {
       JMessage(m) ~~ ("voice" -> json(m.voice))
     case m: PhotoMessage =>
       JMessage(m) ~~ ("photo" -> json(m.photo))
-    case m: DocumentMessage =>
-      JMessage(m) ~~ ("location" -> json(m.document))
+    case m: LocationMessage =>
+      JMessage(m) ~~ ("location" -> json(m.location))
     case m: DocumentMessage =>
       JMessage(m) ~~ ("document" -> json(m.document))
     case m: StickerMessage =>

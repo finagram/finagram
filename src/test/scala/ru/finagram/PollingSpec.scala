@@ -1,10 +1,11 @@
 package ru.finagram
 import com.twitter.util.{ Await, Future }
 import org.mockito.Mockito._
-import org.slf4j.{ Logger, LoggerFactory }
+import org.slf4j.LoggerFactory
 import ru.finagram.api._
-import ru.finagram.test.RandomObjects._
 import ru.finagram.test.{ Spec, TestException }
+
+import scala.util.Random
 
 class PollingSpec extends Spec {
 
@@ -56,6 +57,13 @@ class PollingSpec extends Spec {
       // then:
       verify(client).sendAnswer(token, answer)
     }
+  }
+
+  private def randomString() = Random.nextString(10)
+
+  private def randomUpdatesWithMessage(count: Int): Updates = {
+    val k = Random.nextInt(100)
+    Updates((1 to count).map(i => random[MessageUpdate].copy(updateId = i * k)))
   }
 
   private class TestPolling(

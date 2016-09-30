@@ -1,7 +1,6 @@
 package ru.finagram.api
 
 import org.json4s.Extraction
-import ru.finagram.test.RandomObjects._
 import ru.finagram.test.Spec
 
 import scala.util.Random

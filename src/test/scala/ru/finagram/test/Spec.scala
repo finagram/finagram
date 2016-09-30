@@ -8,11 +8,20 @@ import org.mockito.verification.VerificationWithTimeout
 import org.mockito.{ ArgumentCaptor, Mockito }
 import org.scalatest.words.ShouldVerb
 import org.scalatest.{ FunSpecLike, Matchers }
+import uk.co.jemos.podam.api.PodamFactoryImpl
 
 import scala.concurrent.duration._
 import scala.reflect.{ ClassTag, Manifest }
 
 trait Spec extends FunSpecLike with Matchers with ShouldVerb {
+
+  private val factory = new PodamFactoryImpl()
+
+  def random[T <: AnyRef](implicit classTag: ClassTag[T]): T = {
+    factory.manufacturePojoWithFullData(
+      classTag.runtimeClass.asInstanceOf[Class[T]]
+    )
+  }
 
   def mock[T <: AnyRef](implicit classTag: ClassTag[T]): T = {
     Mockito.mock(

@@ -6,7 +6,6 @@ import ru.finagram.test.Spec
 import ru.finagram.Answers._
 
 import scala.util.Random
-import ru.finagram.test.RandomObjects._
 
 class FinagramBotSpec extends Spec {
 
