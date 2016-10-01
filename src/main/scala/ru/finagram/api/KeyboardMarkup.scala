@@ -1,5 +1,7 @@
 package ru.finagram.api
 
+import java.net.URL
+
 sealed trait KeyboardMarkup
 
 /**
@@ -77,6 +79,6 @@ case class InlineCallbackKeyboardButton(
  */
 case class InlineUrlKeyboardButton(
   text: String,
-  url: String,
+  url: URL,
   switchInlineQuery: Option[String] = None
 ) extends InlineKeyboardButton

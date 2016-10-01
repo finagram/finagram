@@ -1,11 +1,20 @@
-package ru.finagram
+package ru.finagram.api
 
-import ru.finagram.api.{ Keyboard, KeyboardButton }
 import ru.finagram.test.Spec
 
 class KeyboardSpec extends Spec {
 
-  describe("use parameters for build keyboard with specified properties") {
+  describe("build keyboard as Option") {
+    it("should create Option with keyboard") {
+      // when:
+      val keyboard = new Keyboard().createOpt()
+
+      // then:
+      keyboard should contain(new Keyboard().create())
+    }
+  }
+
+  describe("build keyboard with specified properties") {
     it("should build keyboard without parameters") {
       // when:
       val keyboard = new Keyboard().create()
