@@ -9,11 +9,13 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import ru.finagram.test.Spec
 import uk.co.jemos.podam.api.{ AbstractRandomDataProviderStrategy, AttributeMetadata, PodamFactoryImpl }
 
+import scala.util.Random
+
 class MessageSerializerSpec extends Spec {
 
   implicit val formats = DefaultFormats + MessageSerializer
 
-  override val factory = new PodamFactoryImpl(UUIDStringProviderStrategy)
+  override val factory = new PodamFactoryImpl(CustomProviderStrategy)
 
   val randomTextMessage = random[TextMessage]
   val randomDocumentMessage = random[DocumentMessage]
@@ -23,7 +25,7 @@ class MessageSerializerSpec extends Spec {
   val randomPhotoMessage = random[PhotoMessage]
   val randomVoiceMessage = random[VoiceMessage]
 
-  ignore("serialize message to json") {
+  describe("serialize message to json") {
     it(s"should create JObject for text message only with expected fields") {
       // given:
       val msg = randomTextMessage
@@ -93,12 +95,17 @@ class MessageSerializerSpec extends Spec {
     }
   }
 
-  describe(s"deserialize ${classOf[Message]} from json string") {
+  describe(s"deserialize message from json string") {
 
     val messages = Table[Message, String, String, (JValue) => Message](
       ("Message", "Content field name", "Content field value", "Class"),
-//      (randomTextMessage, "text", s""""${randomTextMessage.text}"""", (json: JValue) => json.extract[TextMessage]),
-      (randomDocumentMessage, "document", write(randomDocumentMessage.document), (json: JValue) => json.extract[DocumentMessage])
+      (randomTextMessage, "text", s""""${randomTextMessage.text}"""", (json: JValue) => json.extract[TextMessage]),
+      (randomDocumentMessage, "document", write(randomDocumentMessage.document), (json: JValue) => json.extract[DocumentMessage]),
+      (randomLocationMessage, "location", write(randomLocationMessage.location), (json: JValue) => json.extract[LocationMessage]),
+      (randomPhotoMessage, "photo", write(randomPhotoMessage.photo), (json: JValue) => json.extract[PhotoMessage]),
+      (randomStickerMessage, "sticker", write(randomStickerMessage.sticker), (json: JValue) => json.extract[StickerMessage]),
+      (randomVideoMessage, "video", write(randomVideoMessage.video), (json: JValue) => json.extract[VideoMessage]),
+      (randomVoiceMessage, "voice", write(randomVoiceMessage.voice), (json: JValue) => json.extract[VoiceMessage])
     )
 
 
@@ -115,7 +122,6 @@ class MessageSerializerSpec extends Spec {
              |   "$fieldName":$fieldValue
              |}
         """.stripMargin
-        println(str)
 
         // when:
         val actualMessage = extract(parse(str).camelizeKeys)
@@ -127,20 +133,19 @@ class MessageSerializerSpec extends Spec {
   }
 
   private def write(obj: AnyRef): String = compact(render(Extraction.decompose(obj).snakizeKeys))
+
+  private object CustomProviderStrategy extends AbstractRandomDataProviderStrategy {
+    override def getStringValue(attributeMetadata: AttributeMetadata): String = UUID.randomUUID().toString
+
+    override def getMemoizedObject(attributeMetadata: AttributeMetadata): AnyRef = {
+      // HACK: Class with field Option[Int] after compilation will contain field Option[Object]
+      // and original type will be lost. This holds for every of primitive types.
+      // Change Option[Object] to Option[Int] enough to success, but only for this test class.
+      if (attributeMetadata.getAttrGenericArgs.contains(classOf[Object]))
+        Some(Random.nextInt(100))
+      else
+        super.getMemoizedObject(attributeMetadata)
+    }
+  }
+
 }
-
-object UUIDStringProviderStrategy extends AbstractRandomDataProviderStrategy {
-  override def getStringValue(attributeMetadata: AttributeMetadata): String = UUID.randomUUID().toString
-
-  override def getInteger(attributeMetadata: AttributeMetadata): Integer = 42
-}
-
-object Test extends App {
-  val factory = new PodamFactoryImpl()
-
-  factory.manufacturePojoWithFullData(
-    classOf[Option[Int]]
-  )
-}
-
-class A { val a = Some(42)}
