@@ -1,14 +1,12 @@
 package ru.finagram.api
 
-import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.json4s.JsonAST._
-import org.json4s.native.Serialization
 import ru.finagram.test.Spec
 
 import scala.math.BigInt
 import scala.util.Random
 
-class AnswerSerializerSpec extends Spec {
+class AnswerSerializationSpec extends Spec {
 
   describe("serialize answer") {
     it("should create JObject with only expected fields") {
@@ -17,7 +15,7 @@ class AnswerSerializerSpec extends Spec {
       val answer = FlatAnswer(id.toLong, Random.nextString(12))
 
       // when:
-      val json = AnswerSerializer.serialize(answer)
+      val json = Answer.serialize(answer)
 
       // then:
       json match {

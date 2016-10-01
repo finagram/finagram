@@ -1,5 +1,6 @@
 package ru.finagram.api
 
+import com.twitter.finagle.http.Method.Post
 import com.twitter.finagle.http.{ Method, Request, Response }
 import com.twitter.finagle.{ Http, Service }
 import com.twitter.util.{ Future, Return, Throw, Try }
@@ -102,6 +103,82 @@ class TelegramClient(
   }
 
   /**
+   * Method to edit only the reply markup of messages sent by the bot or via the bot (for inline bots).
+   *
+   * @param token
+   * @param inlineMessageId Identifier of the inline message
+   * @param replyMarkup New markup. None - for delete previous.
+   * @return
+   */
+  def editMessageReplyMarkup(
+    token: String,
+    inlineMessageId: String,
+    replyMarkup: Option[InlineKeyboardMarkup]
+  ): Future[Unit] = {
+    editMessageReplyMarkup(token, None, None, Some(inlineMessageId), replyMarkup)
+  }
+
+  /**
+   * Method to edit only the reply markup of messages sent by the bot or via the bot (for inline bots).
+   *
+   * @param token
+   * @param chatId Unique identifier for the target chat or username of the target channel
+   *               (in the format @channelusername)
+   * @param messageId Unique identifier of the sent message
+   * @param replyMarkup New markup. None - for delete previous.
+   * @return
+   */
+  def editMessageReplyMarkup(
+    token: String,
+    chatId: String,
+    messageId: Int,
+    replyMarkup: Option[InlineKeyboardMarkup]
+  ): Future[Unit] = {
+    editMessageReplyMarkup(token, Some(chatId), Some(messageId), None, replyMarkup)
+  }
+
+  /**
+   * Method to edit only the reply markup of messages sent by the bot or via the bot (for inline bots).
+   *
+   * @param token
+   * @param chatId Required if inlineMessageId is not specified.
+   *               Unique identifier for the target chat or username of the target channel
+   *               (in the format @channelusername)
+   * @param messageId Required if inlineMessageId is not specified.
+   *                  Unique identifier of the sent message
+   * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
+   * @param replyMarkup New markup. None - for delete previous.
+   * @return
+   */
+  private def editMessageReplyMarkup(
+    token: String,
+    chatId: Option[String],
+    messageId: Option[Int],
+    inlineMessageId: Option[String],
+    replyMarkup: Option[InlineKeyboardMarkup]
+  ): Future[Unit] = {
+    val editMessage = EditMessageReplyMarkup(chatId, messageId, inlineMessageId, replyMarkup)
+    http(createEditMessageRequest(token, editMessage))
+      .onSuccess(response => log.debug("Response to answer:\n" + response.contentString))
+      .map(verifyResponseStatus)
+      .unit
+  }
+
+  private def  createEditMessageRequest(token: String, message: EditMessage): Request = {
+    val content = compact(render(EditMessage.serialize(message)))
+    log.trace(s"Prepared answer $content")
+
+    val request = message match {
+      case _: EditMessageReplyMarkup =>
+        Request(Post, s"/bot$token/editMessageReplyMarkup")
+      case _ => ???
+    }
+    request.setContentTypeJson()
+    request.contentString = content
+    request
+  }
+
+  /**
    * Check https response. Correct response:
    * <ul>
    *   <li>contains status in diapason from 200 to 299</li>
@@ -138,7 +215,7 @@ class TelegramClient(
    * @return http request.
    */
   private def postAnswer(token: String, answer: Answer): Request = {
-    val content = compact(render(AnswerSerializer.serialize(answer)))
+    val content = compact(render(Answer.serialize(answer)))
     log.trace(s"Prepared answer $content")
 
     val request = answer match {
