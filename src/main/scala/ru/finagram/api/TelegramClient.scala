@@ -74,7 +74,7 @@ class TelegramClient(
   private def extractFromResponse[T](response: Response): T = {
     val content = response.contentString
     log.trace(s"Received content: $content")
-    Try(TelegramResponse(content)) match {
+    Try(TelegramResponse.deserialize(content)) match {
       case Return(result: T) =>
         result
       case Return(e: TelegramException) =>

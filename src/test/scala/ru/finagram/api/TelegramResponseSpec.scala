@@ -17,7 +17,7 @@ class TelegramResponseSpec extends Spec {
       """.stripMargin
 
       // when:
-      val error = TelegramResponse(content).asInstanceOf[TelegramException]
+      val error = TelegramResponse.deserialize(content).asInstanceOf[TelegramException]
 
       // then:
       error.ok should be(false)
@@ -38,7 +38,7 @@ class TelegramResponseSpec extends Spec {
       """.stripMargin
 
       // when:
-      val updates = TelegramResponse(content).asInstanceOf[Updates]
+      val updates = TelegramResponse.deserialize(content).asInstanceOf[Updates]
 
       // then:
       updates.ok should be(true)
@@ -97,7 +97,7 @@ class TelegramResponseSpec extends Spec {
       """.stripMargin
 
       // when:
-      val updates = TelegramResponse(content).asInstanceOf[Updates]
+      val updates = TelegramResponse.deserialize(content).asInstanceOf[Updates]
 
       // then:
       updates.ok should be(true)
@@ -167,7 +167,7 @@ class TelegramResponseSpec extends Spec {
       """.stripMargin
 
       // when:
-      val updates = TelegramResponse(content).asInstanceOf[Updates]
+      val updates = TelegramResponse.deserialize(content).asInstanceOf[Updates]
 
       // then:
       updates.ok should be(true)
@@ -188,6 +188,35 @@ class TelegramResponseSpec extends Spec {
             )
           )
         )
+    }
+  }
+
+  describe("parse response with file") {
+    it(s"should create instance of ${classOf[FileResponse]}") {
+      // given:
+      val expectedFile = File(
+        fileId = "BQADAgADEccDpWhyC39ABCCdtF",
+        fileSize = Some(8090),
+        filePath = Some("file.png")
+      )
+      val content =
+        s"""
+          |{  
+          |   "ok":true,
+          |   "result":{  
+          |      "file_id":"${expectedFile.fileId}",
+          |      "file_size":${expectedFile.fileSize.get},
+          |      "file_path":"${expectedFile.filePath.get}"
+          |   }
+          |}
+        """.stripMargin
+
+      // when:
+      val response = TelegramResponse.deserialize(content).asInstanceOf[FileResponse]
+
+      // then:
+      response.ok should be(true)
+      response.result should be(expectedFile)
     }
   }
 }

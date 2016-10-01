@@ -31,8 +31,7 @@ class Keyboard {
   }
 
   def buttons(row: String*): Keyboard = {
-    keyboards += row.map(it => KeyboardButton(it))
-    this
+    buttons(row.map(it => KeyboardButton(it)))
   }
 
   def buttons(row: => Seq[KeyboardButton]): Keyboard = {
