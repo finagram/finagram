@@ -97,19 +97,18 @@ class MessageSerializerSpec extends Spec {
 
   describe(s"deserialize message from json string") {
 
-    val messages = Table[Message, String, String, (JValue) => Message](
-      ("Message", "Content field name", "Content field value", "Class"),
-      (randomTextMessage, "text", s""""${randomTextMessage.text}"""", (json: JValue) => json.extract[TextMessage]),
-      (randomDocumentMessage, "document", write(randomDocumentMessage.document), (json: JValue) => json.extract[DocumentMessage]),
-      (randomLocationMessage, "location", write(randomLocationMessage.location), (json: JValue) => json.extract[LocationMessage]),
-      (randomPhotoMessage, "photo", write(randomPhotoMessage.photo), (json: JValue) => json.extract[PhotoMessage]),
-      (randomStickerMessage, "sticker", write(randomStickerMessage.sticker), (json: JValue) => json.extract[StickerMessage]),
-      (randomVideoMessage, "video", write(randomVideoMessage.video), (json: JValue) => json.extract[VideoMessage]),
-      (randomVoiceMessage, "voice", write(randomVoiceMessage.voice), (json: JValue) => json.extract[VoiceMessage])
+    val messages = Table[Message, String, String](
+      ("Message", "Content field name", "Content field value"),
+      (randomTextMessage, "text", s""""${randomTextMessage.text}""""),
+      (randomDocumentMessage, "document", write(randomDocumentMessage.document)),
+      (randomLocationMessage, "location", write(randomLocationMessage.location)),
+      (randomPhotoMessage, "photo", write(randomPhotoMessage.photo)),
+      (randomStickerMessage, "sticker", write(randomStickerMessage.sticker)),
+      (randomVideoMessage, "video", write(randomVideoMessage.video)),
+      (randomVoiceMessage, "voice", write(randomVoiceMessage.voice))
     )
 
-
-    forAll(messages) { (message, fieldName, fieldValue, extract) =>
+    forAll(messages) { (message, fieldName, fieldValue) =>
       it(s"should deserialize ${message.getClass}") {
         // given:
         val str =
@@ -124,7 +123,7 @@ class MessageSerializerSpec extends Spec {
         """.stripMargin
 
         // when:
-        val actualMessage = extract(parse(str).camelizeKeys)
+        val actualMessage = parse(str).camelizeKeys.extract[Message]
 
         // then:
         actualMessage should be(message)
