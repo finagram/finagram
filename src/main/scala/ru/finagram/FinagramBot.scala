@@ -26,7 +26,8 @@ trait FinagramBot extends FinagramHandler {
 
   override private[finagram] val commandHandlers = mutable.Map[String, (Update) => Future[Answer]]()
 
-  private lazy val messageHandler = messageHandlers.reduce((a, b) => a.orElse(b))
+  private lazy val messageHandler = messageHandlers
+    .foldLeft(PartialFunction.empty[MessageUpdate, Future[Answer]])((a, b) => a.orElse(b))
 
   /**
    * Create answer for message.
@@ -34,14 +35,14 @@ trait FinagramBot extends FinagramHandler {
    * @param update incoming update from Telegram.
    * @return answer if handler for message was found or [[None]].
    */
-  override final def handle(update: Update): Future[Option[Answer]] = {
+  override final def handle(update: Update): Future[Option[Answer]] = update match {
     case u: MessageUpdate if messageHandler.isDefinedAt(u) =>
       log.debug(s"Invoke handler for message ${u.message}")
-      messageHandler.apply(u)
+      messageHandler.apply(u).map(Some.apply)
 
     case UpdateWithCommand(u) if commandHandlers.contains(u.command) =>
       log.debug(s"Invoke handler for command ${u.command}")
-      commandHandlers(u.command)(u).map(Some.apply)
+      commandHandlers(u.command)(update).map(Some.apply)
 
     case _ =>
       defaultHandler(update)

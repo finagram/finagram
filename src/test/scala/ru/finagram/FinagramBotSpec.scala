@@ -14,10 +14,11 @@ class FinagramBotSpec extends Spec {
     override def run(): Unit = {}
   }
 
+  val chat = Chat(12L, Random.nextString(12))
+
   describe("handle update") {
-    it("should invoke registered handler") {
+    it("should invoke registered command handler") {
       // given:
-      val chat = Chat(12L, Random.nextString(12))
       val bot = new AnyRef with TestBot {
         on("/command") {
           text("it's work!")
@@ -28,6 +29,37 @@ class FinagramBotSpec extends Spec {
 
       // then:
       answer should contain (FlatAnswer(chat.id, "it's work!"))
+    }
+    it("should invoke handler for every command") {
+      // given:
+      val bot = new AnyRef with TestBot {
+        on("/command_1", "/command_2") {
+          text("it's work!")
+        }
+      }
+      // when:
+      val answer1 = Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command_1")))
+      val answer2 = Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command_2")))
+
+      // then:
+      answer1 should contain (FlatAnswer(chat.id, "it's work!"))
+      answer2 should contain (FlatAnswer(chat.id, "it's work!"))
+    }
+    it("should invoke handler for TextMessage and ignore handler for command") {
+      // given:
+      val bot = new AnyRef with TestBot {
+        on("/command") {
+          text("command handler")
+        }
+        on[TextMessage] {
+          text("message handler")
+        }
+      }
+      // when:
+      val answer = Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command")))
+
+      // then:
+      answer should contain (FlatAnswer(chat.id, "message handler"))
     }
   }
 }

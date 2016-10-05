@@ -36,10 +36,10 @@ class UpdateWithCommand(update: Update) extends Update {
 object UpdateWithCommand {
 
   def apply(update: Update): Boolean = update match {
-    case MessageUpdate(_, message: TextMessage) => true
+    case MessageUpdate(_, _: TextMessage) => true
     case _: CallbackQueryUpdate => true
     case _ => false
   }
 
-  def unapply(arg: UpdateWithCommand): Option[UpdateWithCommand] = if (apply(arg)) Some(arg) else None
+  def unapply(arg: Update): Option[UpdateWithCommand] = if (apply(arg)) Some(new UpdateWithCommand(arg)) else None
 }

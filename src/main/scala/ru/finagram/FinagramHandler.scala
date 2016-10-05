@@ -4,6 +4,7 @@ import com.twitter.util.Future
 import ru.finagram.api.{ Answer, Message, MessageUpdate, Update }
 
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 /**
  * Trait for describe message handlers.
@@ -36,9 +37,11 @@ trait FinagramHandler {
     }
   }
 
-  final def on[T <: Message](handler: (MessageUpdate) => Future[Answer]): Unit = {
-    messageHandlers.add({
-      case u @ MessageUpdate(_, message: T) => handler(u)
-    })
+  final def on[T <: Message](handler: (MessageUpdate) => Future[Answer])(implicit classTag: ClassTag[T]): Unit = {
+    val function: PartialFunction[MessageUpdate, Future[Answer]] = {
+      case u @ MessageUpdate(_, message) if classTag.runtimeClass == message.getClass =>
+        handler(u)
+    }
+    messageHandlers.add(function)
   }
 }
