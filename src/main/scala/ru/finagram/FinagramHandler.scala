@@ -1,7 +1,7 @@
 package ru.finagram
 
 import com.twitter.util.Future
-import ru.finagram.api.{ Answer, Update }
+import ru.finagram.api.{ Answer, Message, MessageUpdate, Update }
 
 import scala.collection.mutable
 
@@ -10,7 +10,8 @@ import scala.collection.mutable
  */
 trait FinagramHandler {
 
-  private[finagram] val handlers: mutable.Map[String, (Update) => Future[Answer]]
+  private[finagram] val commandHandlers: mutable.Map[String, (Update) => Future[Answer]]
+  private[finagram] val messageHandlers: mutable.Set[PartialFunction[MessageUpdate, Future[Answer]]]
 
   /**
    * Add handle for specified text from user.
@@ -28,10 +29,16 @@ trait FinagramHandler {
       if (command.trim.isEmpty) {
         throw new IllegalArgumentException("Command cannot be blank")
       }
-      if (handlers.contains(command)) {
+      if (commandHandlers.contains(command)) {
         throw new IllegalArgumentException(s"Handler for command $command already registered.")
       }
-      handlers(command) = handler
+      commandHandlers(command) = handler
     }
+  }
+
+  final def on[T <: Message](handler: (MessageUpdate) => Future[Answer]): Unit = {
+    messageHandlers.add({
+      case u @ MessageUpdate(_, message: T) => handler(u)
+    })
   }
 }

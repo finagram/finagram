@@ -44,6 +44,13 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
     text("Keyboard", Some(keyboard))
   }
 
+  on[StickerMessage] { update =>
+    val file = getFile(update.message)
+    text(file.filePath.get)(update)
+  }
+
+  def getFile(message: Message): File = ???
+
   run()
 
   /**

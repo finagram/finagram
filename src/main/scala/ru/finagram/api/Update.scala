@@ -23,3 +23,23 @@ case class MessageUpdate(updateId: Long, message: Message) extends Update
  * @param callbackQuery New incoming callback query.
  */
 case class CallbackQueryUpdate(updateId: Long, callbackQuery: CallbackQuery) extends Update
+
+class UpdateWithCommand(update: Update) extends Update {
+  override val updateId: Long = update.updateId
+
+  val command = update match {
+    case MessageUpdate(_, message: TextMessage) => message.text
+    case CallbackQueryUpdate(_, callback) => callback.data
+  }
+}
+
+object UpdateWithCommand {
+
+  def apply(update: Update): Boolean = update match {
+    case MessageUpdate(_, message: TextMessage) => true
+    case _: CallbackQueryUpdate => true
+    case _ => false
+  }
+
+  def unapply(arg: UpdateWithCommand): Option[UpdateWithCommand] = if (apply(arg)) Some(arg) else None
+}

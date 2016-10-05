@@ -22,7 +22,11 @@ trait FinagramBot extends FinagramHandler {
    */
   val token: String
 
-  override private[finagram] val handlers = mutable.Map[String, (Update) => Future[Answer]]()
+  override private[finagram] val messageHandlers = mutable.Set[PartialFunction[MessageUpdate, Future[Answer]]]()
+
+  override private[finagram] val commandHandlers = mutable.Map[String, (Update) => Future[Answer]]()
+
+  private lazy val messageHandler = messageHandlers.reduce((a, b) => a.orElse(b))
 
   /**
    * Create answer for message.
@@ -31,13 +35,16 @@ trait FinagramBot extends FinagramHandler {
    * @return answer if handler for message was found or [[None]].
    */
   override final def handle(update: Update): Future[Option[Answer]] = {
-    extractText(update) match {
-      case Some(command) if handlers.contains(command) =>
-        log.debug(s"Invoke handler for command $command")
-        handlers(command)(update).map(Some.apply)
-      case _ =>
-        defaultHandler(update)
-    }
+    case u: MessageUpdate if messageHandler.isDefinedAt(u) =>
+      log.debug(s"Invoke handler for message ${u.message}")
+      messageHandler.apply(u)
+
+    case UpdateWithCommand(u) if commandHandlers.contains(u.command) =>
+      log.debug(s"Invoke handler for command ${u.command}")
+      commandHandlers(u.command)(u).map(Some.apply)
+
+    case _ =>
+      defaultHandler(update)
   }
 
   /**
@@ -51,25 +58,8 @@ trait FinagramBot extends FinagramHandler {
   def onError: PartialFunction[Throwable, Unit] = {
     case e => log.error("Something wrong", e)
   }
-
-  private def extractText(update: Update): Option[String] = {
-    // TODO maybe delegate it to the external 'Extractor'?
-    update match {
-      case MessageUpdate(_, message) =>
-        message match {
-          // invoke handler for text message
-          case msg: TextMessage =>
-            Some(msg.text)
-
-          case _ => None
-        }
-
-      case CallbackQueryUpdate(_, callback) =>
-        Some(callback.data)
-
-      case _ => ???
-    }
-
-  }
 }
+
+
+
 
