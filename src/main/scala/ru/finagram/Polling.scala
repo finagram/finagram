@@ -20,13 +20,6 @@ trait Polling extends MessageReceiver {
    */
   private val timer = new JavaTimer(true)
 
-  /**
-   * Default error handler
-   */
-  private val defaultErrorHandler: PartialFunction[Throwable, Unit] = {
-    case e => log.error("Not handled exception:", e)
-  }
-
   private[finagram] val client = new TelegramClient()
 
   /**
@@ -55,8 +48,6 @@ trait Polling extends MessageReceiver {
     client.close().join(isStopped).unit
   }
 
-  def handleError: PartialFunction[Throwable, Unit] = defaultErrorHandler
-
   /**
    * Invoked request, handle response with custom logic and send bot answer
    */
@@ -67,7 +58,7 @@ trait Polling extends MessageReceiver {
       .handle(
         // if something was wrong we should try handle message again from current offset
         // TODO is this infinite recursion?
-        handleError.orElse(defaultErrorHandler).andThen(_ => offset)
+        onError.orElse(defaultErrorHandler).andThen(_ => offset)
       )
   }
 
@@ -102,7 +93,7 @@ trait Polling extends MessageReceiver {
    */
   private def takeAnswerFor(update: Update): Future[Option[Answer]] = {
     handle(update).handle {
-       handleError.orElse(defaultErrorHandler).andThen(_ => None)
+       onError.orElse(defaultErrorHandler).andThen(_ => None)
     }
   }
 

@@ -78,6 +78,6 @@ class PollingSpec extends Spec {
       }
     }
     // only IllegalArgumentException can be handled, but all other exception should not crash app
-    override def handleError: PartialFunction[Throwable, Unit] = { case e: IllegalArgumentException => log.error(e.getMessage) }
+    override def onError: PartialFunction[Throwable, Unit] = { case e: IllegalArgumentException => log.error(e.getMessage) }
   }
 }

@@ -52,6 +52,13 @@ trait FinagramBot extends FinagramHandler {
    * Default handler for commands without handler.
    */
    def defaultHandler(update: Update): Future[Option[Answer]] = Future.None
+
+  /**
+   * Handle every exception that will be threw on create answer.
+   */
+  override def onError: PartialFunction[Throwable, Unit] = {
+    case e => log.error("Not handled exception:", e)
+  }
 }
 
 

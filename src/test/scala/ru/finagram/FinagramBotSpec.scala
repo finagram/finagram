@@ -1,10 +1,10 @@
 package ru.finagram
 
-import com.twitter.util.Await
+import com.twitter.util.{ Await, Future }
 import org.mockito.Mockito._
 import ru.finagram.Answers._
 import ru.finagram.api._
-import ru.finagram.test.Spec
+import ru.finagram.test.{ Spec, TestException }
 
 import scala.util.Random
 
@@ -113,6 +113,43 @@ class FinagramBotSpec extends Spec {
 
       // then:
       answer should contain(FlatAnswer(chat.id, "message handler"))
+    }
+  }
+  describe("Bot with exceptions handler") {
+    it("should escalate exception") {
+      // given:
+      val bot = new TestBot {
+        on("/command") {
+          case _: Update => Future.exception[Answer](new TestException())
+        }
+
+        onError {
+          case _: TestException => throw TestException("Escalated")
+        }
+      }
+
+      // then:
+      intercept[TestException] {
+        // when:
+        Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command")))
+      }
+    }
+    it("should exception") {
+      // given:
+      val bot = new TestBot {
+        on("/command") {
+          case _: Update => Future.exception[Answer](new TestException())
+        }
+
+        onError {
+          case _: TestException => None
+        }
+      }
+      // when:
+      val answer = Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command")))
+
+      // then:
+      answer should be(None)
     }
   }
 }
