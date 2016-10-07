@@ -36,7 +36,7 @@ trait Polling extends MessageReceiver {
 
   @volatile
   private var isStarted = false
-  private val isStoped = Promise[Unit]
+  private val isStopped = Promise[Unit]
 
   /**
    * Run process of get updates from Telegram.
@@ -44,7 +44,7 @@ trait Polling extends MessageReceiver {
   override final def run(): Unit = {
     isStarted = true
     Await result repeat(poll, 0L)
-    isStoped.setDone()
+    isStopped.setDone()
   }
 
   /**
@@ -52,7 +52,7 @@ trait Polling extends MessageReceiver {
    */
   final def stop(): Future[Unit] = {
     isStarted = false
-    client.close().join(isStoped).unit
+    client.close().join(isStopped).unit
   }
 
   def handleError: PartialFunction[Throwable, Unit] = defaultErrorHandler
@@ -66,6 +66,7 @@ trait Polling extends MessageReceiver {
       .map(_.getOrElse(offset))
       .handle(
         // if something was wrong we should try handle message again from current offset
+        // TODO is this infinite recursion?
         handleError.orElse(defaultErrorHandler).andThen(_ => offset)
       )
   }
