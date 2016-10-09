@@ -1,6 +1,8 @@
 package ru.finagram
 
 import com.twitter.util.Future
+import org.json4s.native.JsonMethods._
+import org.json4s.{ DefaultFormats, Extraction }
 import org.slf4j.LoggerFactory
 import ru.finagram.api.{ Answer, _ }
 
@@ -12,20 +14,25 @@ import scala.collection.mutable
 trait FinagramBot extends FinagramHandler {
 
   this: MessageReceiver =>
+  private val log = LoggerFactory.getLogger(getClass)
 
-  val log = LoggerFactory.getLogger(getClass)
-
+  override private[finagram] val messageHandlers = mutable.Set[PartialFunction[MessageUpdate, Future[Answer]]]()
+  override private[finagram] val commandHandlers = mutable.Map[String, (Update) => Future[Answer]]()
+  private lazy val messageHandler = messageHandlers
+    .foldLeft(PartialFunction.empty[MessageUpdate, Future[Answer]])((a, b) => a.orElse(b))
   /**
    * Token of the bot.
    */
   val token: String
 
-  override private[finagram] val messageHandlers = mutable.Set[PartialFunction[MessageUpdate, Future[Answer]]]()
+  private val defaultErrorHandler: PartialFunction[(Update, Throwable), Future[Option[Answer]]] = {
+    case (u, e) =>
+      implicit val formats = DefaultFormats + UpdateSerializer
+      log.error(s"Exception on handle update:\n${pretty(render(Extraction.decompose(u).snakizeKeys))}", e)
+      Future.None
+  }
 
-  override private[finagram] val commandHandlers = mutable.Map[String, (Update) => Future[Answer]]()
-
-  private lazy val messageHandler = messageHandlers
-    .foldLeft(PartialFunction.empty[MessageUpdate, Future[Answer]])((a, b) => a.orElse(b))
+  private var errorHandler: PartialFunction[(Update, Throwable), Future[Option[Answer]]] = defaultErrorHandler
 
   /**
    * Create answer for message.
@@ -34,7 +41,7 @@ trait FinagramBot extends FinagramHandler {
    * @return answer if handler for message was found or [[None]].
    */
   override final def handle(update: Update): Future[Option[Answer]] = {
-    update match {
+    val answer = update match {
       case u: MessageUpdate if messageHandler.isDefinedAt(u) =>
         log.debug(s"Invoke handler for message ${u.message}")
         messageHandler.apply(u).map(Some.apply)
@@ -46,18 +53,25 @@ trait FinagramBot extends FinagramHandler {
       case _ =>
         defaultHandler(update)
     }
+    answer.rescue {
+      case e =>
+        errorHandler.applyOrElse((update, e), defaultErrorHandler)
+    }
   }
 
   /**
    * Default handler for commands without handler.
    */
-   def defaultHandler(update: Update): Future[Option[Answer]] = Future.None
+  def defaultHandler(update: Update): Future[Option[Answer]] = Future.None
 
   /**
-   * Handle every exception that will be threw on create answer.
+   * Set exception handler. If this method invoked more than one times, then last argument will used
+   * as exceptions handler.
+   *
+   * @param handler function for recovery update after exception.
    */
-  override def onError: PartialFunction[Throwable, Unit] = {
-    case e => log.error("Not handled exception:", e)
+  def onError(handler: PartialFunction[(Update, Throwable), Future[Option[Answer]]]) = {
+    errorHandler = handler
   }
 }
 

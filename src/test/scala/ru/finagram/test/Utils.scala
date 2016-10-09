@@ -14,7 +14,7 @@ import uk.co.jemos.podam.common.AttributeStrategy
 import scala.concurrent.duration._
 import scala.reflect.{ ClassTag, Manifest }
 
-trait Utils extends FunSpecLike with Matchers {
+trait Utils {
 
   protected val factory = new PodamFactoryImpl()
 

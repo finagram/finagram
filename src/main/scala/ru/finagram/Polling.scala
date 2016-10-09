@@ -3,6 +3,8 @@ package ru.finagram
 import java.util.concurrent.TimeUnit
 
 import com.twitter.util._
+import org.json4s.{ DefaultFormats, Extraction }
+import org.json4s.native.JsonMethods._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
 
@@ -55,18 +57,11 @@ trait Polling extends MessageReceiver {
     client.getUpdates(token, offset)
       .flatMap(handleUpdatesAndExtractNewOffset)
       .map(_.getOrElse(offset))
-      .handle(
-        // if something was wrong we should try handle message again from current offset
-        // TODO is this infinite recursion?
-        onError.orElse(defaultErrorHandler).andThen(_ => offset)
-      )
-  }
-
-  /**
-   * Default error handler
-   */
-  private val defaultErrorHandler: PartialFunction[Throwable, Unit] = {
-    case e => log.error("Not handled exception:", e)
+      .handle{
+        case e =>
+          log.error("Not handled exception:", e)
+          offset
+      }
   }
 
   /**
@@ -91,16 +86,18 @@ trait Polling extends MessageReceiver {
   }
 
   /**
-   * Invoke handler for message and return answer from it. If handler will not found,
-   * or exception will threw then return [[None]].
-   * will returned.
+   * Invoke handler for message and return answer from it.
+   * If exception will threw then return [[None]] will returned.
    *
    * @param update incoming update from Telegram.
    * @return custom bot answer to message or [[None]].
    */
   private def takeAnswerFor(update: Update): Future[Option[Answer]] = {
-    handle(update).handle {
-       onError.orElse(defaultErrorHandler).andThen(_ => None)
+    handle(update).rescue {
+      case e =>
+        implicit val formats = DefaultFormats + UpdateSerializer
+        log.error(s"Exception on handle update:\n${pretty(render(Extraction.decompose(update).snakizeKeys))}", e)
+        Future.None
     }
   }
 

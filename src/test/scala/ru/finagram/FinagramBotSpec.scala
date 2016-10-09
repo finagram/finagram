@@ -120,38 +120,57 @@ class FinagramBotSpec extends FreeSpec with Matchers with Utils {
       answer should contain(FlatAnswer(chat.id, "message handler"))
     }
   }
+  "Bot without exceptions handler" - {
+    val bot = new TestBot {
+      on("/exception") {
+        case _: Update => Future.exception(TestException())
+      }
+    }
+    "when receive update that can not be correctly handled" - {
+      "should catch exception and return None answer" in {
+        // given:
+        val update: MessageUpdate = MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/exception"))
+
+        // when:
+        val answer = Await result bot.handle(update)
+
+        // then:
+        answer should be(None)
+      }
+    }
+  }
   "Bot with exceptions handler" - {
     val bot = new TestBot {
-      on("/command") {
-        case _: Update => Future.exception[Answer](new TestException())
+      on("/rescue") {
+        case _: Update => Future.exception(new Exception("Bot with exceptions handler"))
       }
-
+      on("/exception") {
+        case _: Update => Future.exception(new TestException())
+      }
       onError {
-        case _: TestException => throw TestException("Escalated")
+        case (u, e: Exception) => text("rescue update")(u).map(Some.apply)
+        case (u, e: TestException) => Future.exception(e)
       }
     }
-    "should escalate exception" in {
-      intercept[TestException] {
+    "when receive update that can not be correctly handled but can be rescued" - {
+      "should invoke error handler and send it result" in {
+        // given:
+        val update: MessageUpdate = MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/rescue"))
+
         // when:
-        Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command")))
+        val answer = Await result bot.handle(update)
+
+        // then:
+        answer should contain(FlatAnswer(chat.id, "rescue update"))
       }
     }
-    "should exception" in {
-      // given:
-      val bot = new TestBot {
-        on("/command") {
-          case _: Update => Future.exception[Answer](new TestException())
-        }
-
-        onError {
-          case _: TestException => None
+    "when receive update that can not be correctly handled and rescued" - {
+      "should escalate exception" in {
+        intercept[TestException] {
+          // when:
+          Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/exception")))
         }
       }
-      // when:
-      val answer = Await result bot.handle(MessageUpdate(1L, TextMessage(1L, None, 1L, chat, "/command")))
-
-      // then:
-      answer should be(None)
     }
   }
 

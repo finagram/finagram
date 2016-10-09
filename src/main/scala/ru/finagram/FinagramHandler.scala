@@ -15,7 +15,7 @@ trait FinagramHandler {
   private[finagram] val messageHandlers: mutable.Set[PartialFunction[MessageUpdate, Future[Answer]]]
 
   /**
-   * Add handle for specified text from user.
+   * Add handler for specified text from user.
    * Every command should contain only one handle otherwise [[IllegalArgumentException]] will be thrown.
    *
    * @param commands Commands from user. It should contains at least one command.

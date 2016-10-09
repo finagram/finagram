@@ -48,18 +48,15 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
     text("nice sticker, bro!")
   }
 
+  onError {
+    case (update, e @ NotHandledMessageException(msg)) =>
+      text("Oops!")(update).map(Some.apply)
+  }
+
   run()
 
   /**
    * Default handler for commands without handler.
    */
   override def defaultHandler(update: Update) = text(s"Unknown update $update")(update).map(Some.apply)
-
-  /**
-   * Handle any errors.
-   */
-  override def onError: PartialFunction[Throwable, Unit] = {
-    case NotHandledMessageException(msg) =>
-      log.warn(msg)
-  }
 }

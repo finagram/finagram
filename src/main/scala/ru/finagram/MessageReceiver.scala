@@ -13,12 +13,6 @@ private[finagram] trait MessageReceiver extends Runnable {
    *
    * @param update incoming update from Telegram.
    * @return answer or [[None]].
-   * @throws Exception any type when unsuccessful handle message.
    */
   def handle(update: Update): Future[Option[Answer]]
-
-  /**
-   * Handle every exception that will be threw on create answer.
-   */
-  def onError: PartialFunction[Throwable, Unit]
 }

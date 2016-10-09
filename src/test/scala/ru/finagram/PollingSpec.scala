@@ -79,7 +79,5 @@ class PollingSpec extends FunSpecLike with Matchers with Utils {
         Some(answer(update))
       }
     }
-    // only IllegalArgumentException can be handled, but all other exception should not crash app
-    override def onError: PartialFunction[Throwable, Unit] = { case e: IllegalArgumentException => log.error(e.getMessage) }
   }
 }
