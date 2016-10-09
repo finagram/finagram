@@ -1,8 +1,9 @@
 package ru.finagram.api
 
-import ru.finagram.test.Spec
+import org.scalatest.{ FunSpecLike, Matchers }
+import ru.finagram.test.Utils
 
-class KeyboardSpec extends Spec {
+class KeyboardSpec extends FunSpecLike with Matchers with Utils {
 
   describe("build keyboard as Option") {
     it("should create Option with keyboard") {

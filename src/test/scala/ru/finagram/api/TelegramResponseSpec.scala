@@ -1,8 +1,9 @@
 package ru.finagram.api
 
-import ru.finagram.test.Spec
+import org.scalatest.{ FunSpecLike, Matchers }
+import ru.finagram.test.Utils
 
-class TelegramResponseSpec extends Spec {
+class TelegramResponseSpec extends FunSpecLike with Matchers with Utils {
 
   describe("parse response with error") {
     it(s"should create instance of $TelegramException") {

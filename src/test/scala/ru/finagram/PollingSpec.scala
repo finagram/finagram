@@ -1,13 +1,15 @@
 package ru.finagram
+
 import com.twitter.util.{ Await, Future }
 import org.mockito.Mockito._
+import org.scalatest.{ FunSpecLike, Matchers }
 import org.slf4j.LoggerFactory
 import ru.finagram.api._
-import ru.finagram.test.{ Spec, TestException }
+import ru.finagram.test.{ TestException, Utils }
 
 import scala.util.Random
 
-class PollingSpec extends Spec {
+class PollingSpec extends FunSpecLike with Matchers with Utils {
 
   private val log = LoggerFactory.getLogger(getClass)
 

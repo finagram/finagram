@@ -1,11 +1,11 @@
 package ru.finagram.api
 
-import org.json4s.Extraction
-import ru.finagram.test.Spec
+import org.scalatest.{ FunSpecLike, Matchers }
+import ru.finagram.test.Utils
 
 import scala.util.Random
 
-class TextAnswerSpec extends Spec {
+class TextAnswerSpec extends FunSpecLike with Matchers with Utils {
 
   describe("text field in Answer") {
     it(s"should throw $ContentIsTooLongException when length of content will great than 4096") {

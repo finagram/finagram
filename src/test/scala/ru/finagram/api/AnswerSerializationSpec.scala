@@ -1,12 +1,13 @@
 package ru.finagram.api
 
 import org.json4s.JsonAST._
-import ru.finagram.test.Spec
+import org.scalatest.{ FunSpecLike, Matchers }
+import ru.finagram.test.Utils
 
 import scala.math.BigInt
 import scala.util.Random
 
-class AnswerSerializationSpec extends Spec {
+class AnswerSerializationSpec extends FunSpecLike with Matchers with Utils {
 
   describe("serialize answer") {
     it("should create JObject with only expected fields") {

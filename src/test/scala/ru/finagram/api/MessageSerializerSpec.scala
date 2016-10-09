@@ -5,13 +5,14 @@ import java.util.UUID
 import org.json4s.JsonAST.{ JObject, _ }
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
+import org.scalatest.{ FunSpecLike, Matchers }
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import ru.finagram.test.Spec
+import ru.finagram.test.Utils
 import uk.co.jemos.podam.api.{ AbstractRandomDataProviderStrategy, AttributeMetadata, PodamFactoryImpl }
 
 import scala.util.Random
 
-class MessageSerializerSpec extends Spec {
+class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
 
   implicit val formats = DefaultFormats + MessageSerializer
 

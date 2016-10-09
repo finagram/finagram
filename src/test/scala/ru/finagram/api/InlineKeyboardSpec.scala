@@ -1,10 +1,11 @@
 package ru.finagram.api
 
 import java.net.URL
+import org.scalatest.{ FunSpecLike, Matchers }
 
-import ru.finagram.test.Spec
+import ru.finagram.test.Utils
 
-class InlineKeyboardSpec extends Spec {
+class InlineKeyboardSpec extends FunSpecLike with Matchers with Utils {
 
   describe("create inline keyboard") {
     it(s"should create ${classOf[InlineKeyboard]} with two rows of callback and url buttons") {

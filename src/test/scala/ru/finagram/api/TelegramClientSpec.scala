@@ -5,11 +5,12 @@ import com.twitter.util.Await
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
-import ru.finagram.test.Spec
+import org.scalatest.{ FunSpecLike, Matchers }
+import ru.finagram.test.Utils
 
 import scala.util.Random
 
-class TelegramClientSpec extends Spec {
+class TelegramClientSpec extends FunSpecLike with Matchers with Utils {
 
   describe("get updates") {
     it("should issue GET to /bot<token>/getUpdates with offset and limit") {

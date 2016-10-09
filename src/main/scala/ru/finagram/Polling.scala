@@ -63,6 +63,13 @@ trait Polling extends MessageReceiver {
   }
 
   /**
+   * Default error handler
+   */
+  private val defaultErrorHandler: PartialFunction[Throwable, Unit] = {
+    case e => log.error("Not handled exception:", e)
+  }
+
+  /**
    * Take and increment update id by one, and if update contains message,
    * this method invoke custom handler for this message.
    *
