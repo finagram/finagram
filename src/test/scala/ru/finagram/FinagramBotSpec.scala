@@ -148,8 +148,8 @@ class FinagramBotSpec extends FreeSpec with Matchers with Utils {
         case _: Update => Future.exception(new TestException())
       }
       onError {
-        case (u, e: Exception) => text("rescue update")(u).map(Some.apply)
         case (u, e: TestException) => Future.exception(e)
+        case (u, e: Exception) => text("rescue update")(u).map(Some.apply)
       }
     }
     "when receive update that can not be correctly handled but can be rescued" - {
