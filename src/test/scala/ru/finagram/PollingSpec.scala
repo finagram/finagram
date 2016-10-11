@@ -57,24 +57,7 @@ class PollingSpec extends FreeSpec with Matchers with Utils {
       }
     }
     "when receive response with update that can not be correctly handled" - {
-      "should invoke method rescue and send result as answer" in {
-        // given:
-        val updates = randomUpdatesWithMessage(1)
-        val client = clientThatReturn(updates)
-        val answer: FlatAnswer = mock[FlatAnswer]
-        val polling = new TestPolling(client, throw TestException("On handle message example exception")) {
-          def rescue(update: Update, e: Throwable): Future[Option[Answer]] = {
-            Future(Some(answer))
-          }
-        }
-
-        // when:
-        Await result polling.poll(0)
-
-        // then:
-        verify(client).sendAnswer(polling.token, answer)
-      }
-      "after successful rescue should skip it update and increment offset" in {
+      "should skip it update and increment offset" in {
         val updates = randomUpdatesWithMessage(3)
         val client = clientThatReturn(updates)
         val answers = Seq[() => Option[Answer]](
@@ -89,23 +72,6 @@ class PollingSpec extends FreeSpec with Matchers with Utils {
 
         // then:
         offset should be(updates.result.last.updateId + 1)
-      }
-      "if rescue will be failed" - {
-        "should escalate exception if rescue return future with exception" in {
-          // given:
-          val updates = randomUpdatesWithMessage(1)
-          val client = clientThatReturn(updates)
-          val polling = new TestPolling(client, throw TestException()) {
-            def rescue(update: Update, e: Throwable): Future[Option[Answer]] = {
-              Future.exception(TestException("Escalated exception"))
-            }
-          }
-
-          intercept[TestException] {
-            // when:
-            Await result polling.poll(0)
-          }
-        }
       }
     }
   }
