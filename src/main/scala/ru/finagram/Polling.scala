@@ -45,7 +45,7 @@ trait Polling extends MessageReceiver {
   /**
    * Stop process of get updates from Telegram.
    */
-  final def stop(): Future[Unit] = {
+  override final def close(deadline: Time): Future[Unit] = closeAwaitably {
     isStarted = false
     client.close().join(isStopped).unit
   }

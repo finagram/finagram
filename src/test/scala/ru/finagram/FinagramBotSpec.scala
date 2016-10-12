@@ -1,6 +1,6 @@
 package ru.finagram
 
-import com.twitter.util.{ Await, Future }
+import com.twitter.util.{ Await, Future, Time }
 import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
 import ru.finagram.Answers._
@@ -14,6 +14,15 @@ class FinagramBotSpec extends FreeSpec with Matchers with Utils {
   val chat = Chat(12L, Random.nextString(12))
 
   "Bot" - {
+    "should throw exception if command patter is not set" in {
+      intercept[IllegalArgumentException] {
+        new TestBot {
+          on() {
+            text("Command pattern can't be absent")
+          }
+        }
+      }
+    }
     "should throw exception if command patter is empty" in {
       intercept[IllegalArgumentException] {
         new TestBot {
@@ -28,6 +37,18 @@ class FinagramBotSpec extends FreeSpec with Matchers with Utils {
         new TestBot {
           on("    ") {
             text("Command pattern can't be blank")
+          }
+        }
+      }
+    }
+    "should throw exception if command patter is duplicated" in {
+      intercept[IllegalArgumentException] {
+        new TestBot {
+          on("/command") {
+            text("First declaration of command")
+          }
+          on("/command") {
+            text("Second declaration should throw exception")
           }
         }
       }
@@ -180,4 +201,6 @@ class TestBot extends FinagramBot with MessageReceiver {
   override val token: String = "123-123-123"
 
   override def run(): Unit = {}
+
+  override def close(deadline: Time): Future[Unit] = Future.Unit
 }

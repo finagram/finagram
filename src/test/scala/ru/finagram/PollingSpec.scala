@@ -1,6 +1,7 @@
 package ru.finagram
 
-import com.twitter.util.{ Await, Future }
+import com.twitter.util.{ Await, Duration, Future }
+import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
 import org.slf4j.LoggerFactory
@@ -14,6 +15,22 @@ class PollingSpec extends FreeSpec with Matchers with Utils {
   private val log = LoggerFactory.getLogger(getClass)
 
   "Long polling" - {
+    "should issue requests to Telegram at least two times for timeout x 3 period" in {
+      // given:
+      val bot = new TestPolling(clientThatReturn(randomUpdatesWithMessage(1)), Some(FlatAnswer(1L, "ping"))) {
+        override val timeout = Duration.fromMilliseconds(100L)
+      }
+      val t = new Thread(bot)
+      t.setDaemon(true)
+
+      // when:
+      t.start()
+      Thread.sleep(bot.timeout.inMillis * 3)
+      Await result bot.close()
+
+      // then:
+      verify(bot.client, Mockito.atLeast(2)).getUpdates(any[String], any[Long], any[Option[Int]])
+    }
     "when receive response with update" - {
       "should send answer from handler to the Telegram" in {
         // given:
@@ -87,6 +104,7 @@ class PollingSpec extends FreeSpec with Matchers with Utils {
     val client = mock[TelegramClient]
     doReturn(Future(updates.result)).when(client).getUpdates(any[String], any[Long], any[Option[Int]])
     doReturn(Future.Unit).when(client).sendAnswer(any[String], any[Answer])
+    doReturn(Future.Unit).when(client).close()
     client
   }
 

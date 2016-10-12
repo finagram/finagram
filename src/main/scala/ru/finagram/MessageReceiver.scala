@@ -1,12 +1,12 @@
 package ru.finagram
 
-import com.twitter.util.Future
+import com.twitter.util.{ Closable, CloseAwaitably, Future }
 import ru.finagram.api.{ Answer, Update }
 
 /**
  * Interface for strategy of receive messages from Telegram.
  */
-private[finagram] trait MessageReceiver extends Runnable {
+private[finagram] trait MessageReceiver extends Runnable with Closable with CloseAwaitably {
 
   /**
    * Create answer for message.
