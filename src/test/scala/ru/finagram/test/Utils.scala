@@ -1,15 +1,9 @@
 package ru.finagram.test
 
-import com.twitter.finagle.Service
-import com.twitter.finagle.http.{ Request, Response }
-import com.twitter.util.Future
 import org.mockito.Mockito._
 import org.mockito.verification.VerificationWithTimeout
 import org.mockito.{ ArgumentCaptor, Mockito }
-import org.scalatest.words.ShouldVerb
-import org.scalatest.{ FunSpecLike, Matchers }
 import uk.co.jemos.podam.api.PodamFactoryImpl
-import uk.co.jemos.podam.common.AttributeStrategy
 
 import scala.concurrent.duration._
 import scala.reflect.{ ClassTag, Manifest }
@@ -41,17 +35,5 @@ trait Utils {
 
   def timeout(duration: Duration): VerificationWithTimeout = {
     Mockito.timeout(duration.toMillis.toInt)
-  }
-
-  def clientWithResponse(response: Response): Service[Request, Response] = {
-    val http = mock[Service[Request, Response]]
-    doReturn(Future(response)).when(http).apply(any[Request])
-    http
-  }
-
-  def responseWithContent(content: String): Response = {
-    val response = Response()
-    response.contentString = content
-    response
   }
 }

@@ -13,6 +13,7 @@ sealed trait TelegramResponse {
 object TelegramResponse {
   implicit val formats = DefaultFormats + UpdateSerializer + MessageSerializer
 
+  // FIXME write serializer for TelegramResponse and remove this method:
   def deserialize(content: String): TelegramResponse = {
     val json = parse(content).camelizeKeys
     val ok = (json \ "ok").extract[Boolean]
