@@ -1,9 +1,5 @@
 package ru.finagram.api
 
-import org.json4s._
-import org.json4s.native.JsonMethods._
-import ru.finagram.api.json.{ MessageSerializer, UpdateSerializer }
-
 /**
  * Response from Telegram on request.
  */
