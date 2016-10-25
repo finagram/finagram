@@ -1,8 +1,9 @@
-package ru.finagram.api
+package ru.finagram.api.json
 
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.{ DefaultFormats, Extraction, Formats, JValue, Serializer, TypeInfo }
+import ru.finagram.api._
 
 object MessageSerializer extends Serializer[Message] {
 

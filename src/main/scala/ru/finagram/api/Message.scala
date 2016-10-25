@@ -19,7 +19,7 @@ sealed trait Message {
  * @param chat 	    Conversation the message belongs to.
  * @param text      The actual UTF-8 text of the message, 0-4096 characters.
  */
-case class TextMessage(messageId: Long, from: Option[User], date: Long, chat: Chat, text: String) extends Message
+case class TextMessage(messageId: Long, from: Option[User] = None, date: Long, chat: Chat, text: String) extends Message
 
 /**
  * Sticker.

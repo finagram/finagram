@@ -7,6 +7,7 @@ import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
+import ru.finagram.api.json.TelegramResponseSerializer
 import ru.finagram.test.Utils
 
 import scala.util.Random
@@ -64,7 +65,7 @@ class TelegramClientSpec extends FreeSpec with Matchers with Utils {
   private def randomToken = Random.nextString(10)
 
   private def toJsonString(response: TelegramResponse): String = {
-    implicit val formats = DefaultFormats + FieldSerializer[TelegramResponse]()
+    implicit val formats = DefaultFormats + TelegramResponseSerializer
     val str = compact(render(Extraction.decompose(response).snakizeKeys))
     str
   }

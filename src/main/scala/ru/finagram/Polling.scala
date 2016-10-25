@@ -7,6 +7,7 @@ import org.json4s.{ DefaultFormats, Extraction }
 import org.json4s.native.JsonMethods._
 import org.slf4j.{ Logger, LoggerFactory }
 import ru.finagram.api._
+import ru.finagram.api.json.UpdateSerializer
 
 /**
  * Implementation of the mechanism of long polling that invoked handlers for received messages.

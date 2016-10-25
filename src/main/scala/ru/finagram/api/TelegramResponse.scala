@@ -2,6 +2,7 @@ package ru.finagram.api
 
 import org.json4s._
 import org.json4s.native.JsonMethods._
+import ru.finagram.api.json.{ MessageSerializer, UpdateSerializer }
 
 /**
  * Response from Telegram on request.
@@ -10,25 +11,25 @@ sealed trait TelegramResponse {
   val ok: Boolean
 }
 
-object TelegramResponse {
-  implicit val formats = DefaultFormats + UpdateSerializer + MessageSerializer
-
-  // FIXME write serializer for TelegramResponse and remove this method:
-  def deserialize(content: String): TelegramResponse = {
-    val json = parse(content).camelizeKeys
-    val ok = (json \ "ok").extract[Boolean]
-    if (ok) {
-      (json \ "result") match {
-        case _: JArray =>
-          json.extract[Updates]
-        case _: JObject =>
-          json.extract[FileResponse]
-      }
-    } else {
-      json.extract[TelegramException]
-    }
-  }
-}
+//object TelegramResponse {
+//  implicit val formats = DefaultFormats + UpdateSerializer + MessageSerializer
+//
+//  // FIXME write serializer for TelegramResponse and remove this method:
+//  def deserialize(content: String): TelegramResponse = {
+//    val json = parse(content).camelizeKeys
+//    val ok = (json \ "ok").extract[Boolean]
+//    if (ok) {
+//      (json \ "result") match {
+//        case _: JArray =>
+//          json.extract[Updates]
+//        case _: JObject =>
+//          json.extract[FileResponse]
+//      }
+//    } else {
+//      json.extract[TelegramException]
+//    }
+//  }
+//}
 
 /**
  * Description of the error.

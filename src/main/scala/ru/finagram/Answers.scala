@@ -14,7 +14,7 @@ object Answers {
   final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     FlatAnswer(
       chatId = extractChatId(update),
-      content = text,
+      text = text,
       keyboard
     )
   }
@@ -22,7 +22,7 @@ object Answers {
   final def markdown(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     MarkdownAnswer(
       chatId = extractChatId(update),
-      content = text,
+      text = text,
       keyboard
     )
   }
@@ -30,7 +30,7 @@ object Answers {
   final def html(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     HtmlAnswer(
       chatId = extractChatId(update),
-      content = text,
+      text = text,
       keyboard
     )
   }
@@ -54,10 +54,10 @@ object Answers {
 
   /**
    * Read all from resources (if resource with specified path exists) or from file
-   * and return content as [[String]].
+   * and return text as [[String]].
    *
    * @param path path to resource or file.
-   * @return content from resource or file.
+   * @return text from resource or file.
    */
   final def from(path: String): String = {
     val source = Option(getClass.getResource(path)) match {

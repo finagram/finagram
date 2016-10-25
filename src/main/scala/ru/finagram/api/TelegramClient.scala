@@ -4,10 +4,11 @@ import com.twitter.finagle.http.Method.Post
 import com.twitter.finagle.http.{ Method, Request, Response }
 import com.twitter.finagle.{ Http, Service }
 import com.twitter.util.{ Future, Return, Throw, Try }
-import org.json4s.DefaultFormats
+import org.json4s.{ DefaultFormats, Extraction }
 import org.json4s.native.JsonMethods._
 import org.slf4j.LoggerFactory
 import ru.finagram.UnexpectedResponseException
+import ru.finagram.api.json.{ AnswerSerializer, TelegramResponseSerializer }
 
 /**
  * Contains methods for issue http requests to Telegram.
@@ -23,7 +24,7 @@ class TelegramClient(
   /**
    * Default formats for json.
    */
-  private implicit val formats = DefaultFormats
+  private implicit val formats = DefaultFormats + AnswerSerializer + TelegramResponseSerializer
 
   /**
    * Issue Http GET request to Telegram with offset and limit as query parameters.
@@ -74,7 +75,7 @@ class TelegramClient(
   private def extractFromResponse[T](response: Response): T = {
     val content = response.contentString
     log.trace(s"Received content: $content")
-    Try(TelegramResponse.deserialize(content)) match {
+    Try(Extraction.decompose(content).snakizeKeys) match {
       case Return(result: T) =>
         result
       case Return(e: TelegramException) =>
@@ -215,7 +216,7 @@ class TelegramClient(
    * @return http request.
    */
   private def postAnswer(token: String, answer: Answer): Request = {
-    val content = compact(render(Answer.serialize(answer)))
+    val content = compact(render(Extraction.decompose(answer).snakizeKeys))
     log.trace(s"Prepared answer $content")
 
     val request = answer match {

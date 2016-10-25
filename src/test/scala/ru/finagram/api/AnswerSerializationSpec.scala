@@ -1,5 +1,6 @@
 package ru.finagram.api
 
+import org.json4s.{ DefaultFormats, Extraction }
 import org.json4s.JsonAST._
 import org.scalatest.{ FunSpecLike, Matchers }
 import ru.finagram.test.Utils
@@ -9,6 +10,8 @@ import scala.util.Random
 
 class AnswerSerializationSpec extends FunSpecLike with Matchers with Utils {
 
+  private implicit val formats = DefaultFormats //+ AnswerSerializer
+
   describe("serialize answer") {
     it("should create JObject with only expected fields") {
       // given:
@@ -16,7 +19,7 @@ class AnswerSerializationSpec extends FunSpecLike with Matchers with Utils {
       val answer = FlatAnswer(id.toLong, Random.nextString(12))
 
       // when:
-      val json = Answer.serialize(answer)
+      val json = Extraction.decompose(answer).snakizeKeys
 
       // then:
       json match {

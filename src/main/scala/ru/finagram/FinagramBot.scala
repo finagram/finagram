@@ -4,6 +4,7 @@ import com.twitter.util.Future
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
 import org.slf4j.LoggerFactory
+import ru.finagram.api.json.UpdateSerializer
 import ru.finagram.api.{ Answer, _ }
 
 import scala.collection.mutable
