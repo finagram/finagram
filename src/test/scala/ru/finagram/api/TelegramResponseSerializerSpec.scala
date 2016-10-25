@@ -2,7 +2,7 @@ package ru.finagram.api
 
 import org.json4s.native.JsonMethods._
 import org.scalatest.{ FreeSpec, Matchers }
-import ru.finagram.api.json.Implicit.FORMATS
+import ru.finagram.api.json.Implicit.formats
 import ru.finagram.test.Utils
 
 class TelegramResponseSerializerSpec extends FreeSpec with Matchers with Utils {

@@ -37,7 +37,7 @@ object TelegramResponseSerializer extends Serializer[TelegramResponse] {
   }
 
   private def json(obj: AnyRef): JValue = {
-    import ru.finagram.api.json.Implicit.FORMATS
+    import ru.finagram.api.json.Implicit.formats
     Extraction.decompose(obj)
   }
 }
