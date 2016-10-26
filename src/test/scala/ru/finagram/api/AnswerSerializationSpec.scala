@@ -10,8 +10,26 @@ import scala.util.Random
 
 class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
 
+  "when serializing text answer to json" - {
+    "should be created json object with only expected fields" in {
+      // given:
+      val id = Random.nextLong()
+      val text = Random.nextString(12)
+      val answer = FlatAnswer(id, text)
 
-  "when serializing any answers to json" - {
+      // when:
+      val result = Extraction.decompose(answer).snakizeKeys
+
+      // then:
+      result should be(
+        Json(s"""
+           {
+             "chat_id": $id,
+             "text": "$text"
+           }
+        """)
+      )
+    }
     "should be created json object with all set fields" in {
       // given:
       val id = Random.nextLong()
@@ -40,27 +58,6 @@ class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
              "disable_notification": true,
              "disable_web_page_preview": true,
              "reply_to_message_id": $reply,
-             "text": "$text"
-           }
-        """)
-      )
-    }
-  }
-  "when serializing text answer to json" - {
-    "should be created json object with only expected fields" in {
-      // given:
-      val id = Random.nextLong()
-      val text = Random.nextString(12)
-      val answer = FlatAnswer(id, text)
-
-      // when:
-      val result = Extraction.decompose(answer).snakizeKeys
-
-      // then:
-      result should be(
-        Json(s"""
-           {
-             "chat_id": $id,
              "text": "$text"
            }
         """)
