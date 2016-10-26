@@ -1,6 +1,6 @@
 package ru.finagram.api.json
 
-import org.json4s.JsonAST.{ JLong, JObject }
+import org.json4s.JsonAST.{ JInt, JObject }
 import org.json4s.JsonDSL._
 import org.json4s.{ DefaultFormats, Extraction, Formats, JValue, Serializer, TypeInfo }
 import ru.finagram.api._
@@ -18,24 +18,20 @@ object AnswerSerializer extends Serializer[Answer] {
           json.extract[HtmlAnswer]
         case v if v.contains("text") =>
           json.extract[FlatAnswer]
-
         case v if v.contains("photo") =>
           json.extract[PhotoAnswer]
-
         case v if v.contains("sticker") =>
           json.extract[StickerAnswer]
-
-        case _ => ???
       }
   }
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
     case a: FlatAnswer =>
-      JAnswer(a) ~~ ("text" -> a.text)
+      JTextAnswer(a) ~~ ("text" -> a.text)
     case a: MarkdownAnswer =>
-      JAnswer(a) ~~ ("text" -> a.text) ~~ ("parseMode" -> "Markdown")
+      JTextAnswer(a) ~~ ("text" -> a.text) ~~ ("parseMode" -> "Markdown")
     case a: HtmlAnswer =>
-      JAnswer(a) ~~ ("text" -> a.text) ~~ ("parseMode" -> "HTML")
+      JTextAnswer(a) ~~ ("text" -> a.text) ~~ ("parseMode" -> "HTML")
 
     case a: PhotoAnswer =>
       if (a.caption.isEmpty)
@@ -45,12 +41,18 @@ object AnswerSerializer extends Serializer[Answer] {
 
     case a: StickerAnswer =>
       JAnswer(a) ~~ ("sticker" -> a.sticker)
+  }
 
-    case _ => ???
+  private def JTextAnswer(a: TextAnswer): JObject = {
+    if (a.disableWebPagePreview.isDefined) {
+      JAnswer(a) ~~ ("disableWebPagePreview" -> a.disableWebPagePreview.get)
+    } else {
+      JAnswer(a)
+    }
   }
 
   private def JAnswer(a: Answer): JObject = {
-    var jobj = JObject("chatId" -> JLong(a.chatId))
+    var jobj = JObject("chatId" -> JInt(a.chatId))
     jobj = if (a.disableNotification.isEmpty) jobj else jobj ~~ ("disableNotification" -> a.disableNotification.get)
     jobj = if (a.replyMarkup.isEmpty) jobj else jobj ~~ ("replyMarkup" -> json(a.replyMarkup.get))
     jobj = if (a.replyToMessageId.isEmpty) jobj else jobj ~~ ("replyToMessageId" -> a.replyToMessageId.get)

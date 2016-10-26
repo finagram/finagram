@@ -4,6 +4,7 @@ import java.io.FileNotFoundException
 import java.nio.file.Paths
 
 import com.twitter.util.Future
+import ru.finagram.!!!
 import ru.finagram.api._
 
 import scala.io.Source
@@ -82,7 +83,6 @@ object Answers {
     case CallbackQueryUpdate(_, callback) =>
       callback.from.id
 
-    case _ =>
-      ???
+    case v => !!!(s"Not implemented extractChatId for $v")
   }
 }

@@ -4,6 +4,7 @@ import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.{ DefaultFormats, Extraction, Formats, JValue, Serializer, TypeInfo }
 import ru.finagram.api._
+import ru.finagram.!!!
 
 object MessageSerializer extends Serializer[Message] {
 
@@ -26,8 +27,7 @@ object MessageSerializer extends Serializer[Message] {
           json.extract[StickerMessage]
         case v if v.contains("text") =>
           json.extract[TextMessage]
-        case _ =>
-          ???
+        case v => !!!(s"Not implement deserialization for $v")
       }
   }
 
