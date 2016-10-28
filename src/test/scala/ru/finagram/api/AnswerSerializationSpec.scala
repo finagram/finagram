@@ -11,7 +11,7 @@ import scala.util.Random
 class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
 
   "when serializing text answer to json" - {
-    "should be created json object with only expected fields" in {
+    "should be created json object with only the initialized fields" in {
       // given:
       val id = Random.nextLong()
       val text = Random.nextString(12)
@@ -30,7 +30,7 @@ class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
         """)
       )
     }
-    "should be created json object with all set fields" in {
+    "should be created json object with all initialized fields" in {
       // given:
       val id = Random.nextLong()
       val text = Random.nextString(12)
@@ -85,4 +85,55 @@ class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
     }
   }
 
+  "when serialize photo answer to json" - {
+    "should be created correct json object" in {
+      // given:
+      val answer = PhotoAnswer(
+        chatId = Random.nextLong(),
+        photo = Random.nextString(5),
+        caption = Some(Random.nextString(5))
+      )
+
+      // when:
+      val result = Extraction.decompose(answer).snakizeKeys
+
+      // then:
+      result should be(
+        Json(
+          s"""
+             {
+                "chat_id": ${answer.chatId},
+                "photo": "${answer.photo}",
+                "caption": "${answer.caption.get}"
+             }
+          """
+        )
+      )
+    }
+  }
+
+  "when serialize sticker answer to json" - {
+    "should be created correct json object" in {
+      // given:
+      val answer = StickerAnswer(
+        chatId = Random.nextLong(),
+        sticker = Random.nextString(5)
+      )
+
+      // when:
+      val result = Extraction.decompose(answer).snakizeKeys
+
+      // then:
+      result should be(
+        Json(
+          s"""
+             {
+                "chat_id": ${answer.chatId},
+                "sticker": "${answer.sticker}"
+             }
+          """
+        )
+      )
+    }
+  }
 }
