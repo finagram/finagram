@@ -8,28 +8,7 @@ import ru.finagram.!!!
 
 object MessageSerializer extends Serializer[Message] {
 
-  private val MessageClass = classOf[Message]
-
-  override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Message] = {
-    case (TypeInfo(MessageClass, _), json: JObject) =>
-      json.values match {
-        case v if v.contains("video") =>
-          json.extract[VideoMessage]
-        case v if v.contains("voice") =>
-          json.extract[VoiceMessage]
-        case v if v.contains("photo") =>
-          json.extract[PhotoMessage]
-        case v if v.contains("location") =>
-          json.extract[LocationMessage]
-        case v if v.contains("document") =>
-          json.extract[DocumentMessage]
-        case v if v.contains("sticker") =>
-          json.extract[StickerMessage]
-        case v if v.contains("text") =>
-          json.extract[TextMessage]
-        case v => !!!(s"Not implement deserialization for $v")
-      }
-  }
+  override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Message] = PartialFunction.empty
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
     case m: VideoMessage =>

@@ -1,8 +1,5 @@
 package ru.finagram.api
 
-import org.json4s.{ DefaultFormats, Extraction, FieldSerializer, _ }
-import org.json4s.native.JsonMethods._
-
 /**
  * Trait that represents answers from Bot to user.
  */
