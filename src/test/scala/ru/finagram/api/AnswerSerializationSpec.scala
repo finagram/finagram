@@ -179,5 +179,52 @@ class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
         ))
       }
     }
+    "when deserialize photo answer from json" - {
+      "should be created expected object" in {
+        // given:
+        val chatId = Random.nextLong()
+        val photo = Random.nextString(5)
+        val caption = Some(Random.nextString(5))
+
+        // when:
+        val result = parse(
+          s"""
+            {
+               "chat_id": $chatId,
+               "photo": "$photo",
+               "caption": "${caption.get}"
+            }
+          """).camelizeKeys.extract[PhotoAnswer]
+
+        // then:
+        result should be(PhotoAnswer(
+          chatId = chatId,
+          photo = photo,
+          caption = caption
+        ))
+      }
+    }
+    "when deserialize sticker answer from json" - {
+      "should be created expected object" in {
+        // given:
+        val chatId = Random.nextLong()
+        val sticker = Random.nextString(5)
+
+        // when:
+        val result = parse(
+          s"""
+            {
+               "chat_id": $chatId,
+               "sticker": "$sticker"
+            }
+          """).camelizeKeys.extract[StickerAnswer]
+
+        // then:
+        result should be(StickerAnswer(
+          chatId = chatId,
+          sticker = sticker
+        ))
+      }
+    }
   }
 }
