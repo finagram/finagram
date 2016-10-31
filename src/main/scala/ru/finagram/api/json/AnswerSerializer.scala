@@ -7,7 +7,23 @@ import ru.finagram.api._
 
 object AnswerSerializer extends Serializer[Answer] {
 
-  override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Answer] = PartialFunction.empty
+  private val AnswerClass = classOf[Answer]
+
+  override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Answer] = {
+    case (TypeInfo(AnswerClass, _), json: JObject) =>
+      json.values match {
+        case v if v.contains("text") && v("parse_mode") == "Markdown" =>
+          json.extract[MarkdownAnswer]
+        case v if v.contains("text") && v("parse_mode") == "HTML" =>
+          json.extract[HtmlAnswer]
+        case v if v.contains("text") =>
+          json.extract[FlatAnswer]
+        case v if v.contains("photo") =>
+          json.extract[PhotoAnswer]
+        case v if v.contains("sticker") =>
+          json.extract[StickerAnswer]
+      }
+  }
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
     case a: FlatAnswer =>

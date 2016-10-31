@@ -8,7 +8,8 @@ package object json {
     TelegramResponseSerializer,
     UpdateSerializer,
     MessageSerializer,
-    AnswerSerializer
+    AnswerSerializer,
+    KeyboardMarkupSerializer
   )
 
   object Implicit {
