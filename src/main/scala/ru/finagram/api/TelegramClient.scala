@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory
 import ru.finagram.UnexpectedResponseException
 import ru.finagram.api.json.{ AnswerSerializer, TelegramResponseSerializer }
 
+import scala.reflect.ClassTag
+
 /**
  * Contains methods for issue http requests to Telegram.
  */
@@ -72,16 +74,19 @@ class TelegramClient(
    * @throws TelegramException when response is not ok (field 'ok' is false).
    * @throws UnexpectedResponseException when parsing of the response was failed.
    */
-  private def extractFromResponse[T <: TelegramResponse](response: Response): T = {
+  private def extractFromResponse[T <: TelegramResponse : ClassTag](response: Response): T = {
+    val clazz = implicitly[ClassTag[T]].runtimeClass
     val content = response.contentString
     log.trace(s"Received content: $content")
     Try(parse(content).camelizeKeys.extract[TelegramResponse]) match {
-      case Return(result: T) =>
-        result
+      case Return(result) if clazz.isInstance(result) =>
+        result.asInstanceOf[T]
       case Return(e: TelegramException) =>
         throw e
       case Throw(e) =>
         throw new UnexpectedResponseException("Parse response failed.", e)
+      case _ =>
+        throw new UnexpectedResponseException(s"Not expected content:\n$content")
     }
   }
 

@@ -30,6 +30,7 @@ class UpdateWithCommand(update: Update) extends Update {
   val command = update match {
     case MessageUpdate(_, message: TextMessage) => message.text
     case CallbackQueryUpdate(_, callback) => callback.data
+    case notExpectedUpdate => throw new RuntimeException("Not expected update " + notExpectedUpdate)
   }
 }
 

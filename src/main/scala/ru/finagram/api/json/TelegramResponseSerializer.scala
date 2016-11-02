@@ -13,11 +13,12 @@ object TelegramResponseSerializer extends Serializer[TelegramResponse] {
     case (TypeInfo(ResponseClass, _), json: JObject) =>
       val ok = (json \ "ok").extract[Boolean]
       if (ok) {
-        (json \ "result") match {
+        json \ "result" match {
           case _: JArray =>
             json.extract[Updates]
           case _: JObject =>
             json.extract[FileResponse]
+          case _ => ???
         }
       } else {
         json.extract[TelegramException]
