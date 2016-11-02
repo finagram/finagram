@@ -79,6 +79,6 @@ case class InlineCallbackKeyboardButton(
  */
 case class InlineUrlKeyboardButton(
   text: String,
-  url: URL,
+  url: String,
   switchInlineQuery: Option[String] = None
 ) extends InlineKeyboardButton

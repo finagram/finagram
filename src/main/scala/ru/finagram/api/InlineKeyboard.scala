@@ -30,7 +30,7 @@ class InlineKeyboard {
     val data = tuple._2.toString
     val answer = data.toLowerCase
     if (answer.startsWith("http://") || answer.startsWith("https://")) {
-      InlineUrlKeyboardButton(text, new URL(data))
+      InlineUrlKeyboardButton(text, data)
     } else {
       InlineCallbackKeyboardButton(text, data)
     }

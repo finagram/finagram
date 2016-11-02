@@ -19,10 +19,10 @@ class InlineKeyboardSpec extends FreeSpec with Matchers with Utils {
       keyboard.inlineKeyboard should have size (2)
       keyboard.inlineKeyboard.head should contain allOf(
         InlineCallbackKeyboardButton("callback 1", "/callback1"),
-        InlineUrlKeyboardButton("link 1", new URL("https://google.com"))
+        InlineUrlKeyboardButton("link 1", "https://google.com")
         )
       keyboard.inlineKeyboard.last should contain allOf(
-        InlineUrlKeyboardButton("link 2", new URL("http://example.com")),
+        InlineUrlKeyboardButton("link 2", "http://example.com"),
         InlineCallbackKeyboardButton("callback 2", "answer for callback 2")
         )
     }
@@ -34,7 +34,7 @@ class InlineKeyboardSpec extends FreeSpec with Matchers with Utils {
       keyboard.inlineKeyboard should have size 1
       keyboard.inlineKeyboard.head should contain allOf(
         InlineCallbackKeyboardButton("button 1", "1"),
-        InlineUrlKeyboardButton("button 2", new URL("http://localhost"))
+        InlineUrlKeyboardButton("button 2", "http://localhost")
       )
     }
     "should Option with keyboard" in {

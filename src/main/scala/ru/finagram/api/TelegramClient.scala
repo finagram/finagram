@@ -24,7 +24,7 @@ class TelegramClient(
   /**
    * Default formats for json.
    */
-  private implicit val formats = DefaultFormats + AnswerSerializer + TelegramResponseSerializer
+  import ru.finagram.api.json.Implicit.formats
 
   /**
    * Issue Http GET request to Telegram with offset and limit as query parameters.
