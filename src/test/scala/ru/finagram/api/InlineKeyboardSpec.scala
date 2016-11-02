@@ -1,14 +1,14 @@
 package ru.finagram.api
 
 import java.net.URL
-import org.scalatest.{ FunSpecLike, Matchers }
 
+import org.scalatest.{ FreeSpec, Matchers }
 import ru.finagram.test.Utils
 
-class InlineKeyboardSpec extends FunSpecLike with Matchers with Utils {
+class InlineKeyboardSpec extends FreeSpec with Matchers with Utils {
 
-  describe("create inline keyboard") {
-    it(s"should create ${classOf[InlineKeyboard]} with two rows of callback and url buttons") {
+  "create inline keyboard" - {
+    s"should create ${classOf[InlineKeyboard]} with two rows of callback and url buttons" in {
       // when:
       val keyboard: InlineKeyboardMarkup = new InlineKeyboard()
         .buttons("callback 1" -> "/callback1", "link 1" -> "https://google.com")
@@ -26,7 +26,7 @@ class InlineKeyboardSpec extends FunSpecLike with Matchers with Utils {
         InlineCallbackKeyboardButton("callback 2", "answer for callback 2")
         )
     }
-    it("should create keyboard with one row of buttons") {
+    "should create keyboard with one row of buttons" in {
       // when:
       val keyboard = InlineKeyboard("button 1" -> 1, "button 2" -> "http://localhost")
 
@@ -37,7 +37,7 @@ class InlineKeyboardSpec extends FunSpecLike with Matchers with Utils {
         InlineUrlKeyboardButton("button 2", new URL("http://localhost"))
       )
     }
-    it("should Option with keyboard") {
+    "should Option with keyboard" in {
       // when:
       val keyboard = new InlineKeyboard().createOpt()
 

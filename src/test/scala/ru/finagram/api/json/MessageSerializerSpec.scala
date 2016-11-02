@@ -1,13 +1,13 @@
-package ru.finagram.api
+package ru.finagram.api.json
 
 import java.util.UUID
 
 import org.json4s.JsonAST.{ JObject, _ }
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
-import org.scalatest.{ FunSpecLike, Matchers }
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import ru.finagram.api.json.MessageSerializer
+import org.scalatest.{ FunSpecLike, Matchers }
+import ru.finagram.api._
 import ru.finagram.test.Utils
 import uk.co.jemos.podam.api.{ AbstractRandomDataProviderStrategy, AttributeMetadata, PodamFactoryImpl }
 

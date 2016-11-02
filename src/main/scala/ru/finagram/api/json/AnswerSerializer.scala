@@ -12,9 +12,9 @@ object AnswerSerializer extends Serializer[Answer] {
   override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Answer] = {
     case (TypeInfo(AnswerClass, _), json: JObject) =>
       json.values match {
-        case v if v.contains("text") && v("parse_mode") == "Markdown" =>
+        case v if v.contains("parseMode") && "Markdown".equalsIgnoreCase(v("parseMode").toString)  =>
           json.extract[MarkdownAnswer]
-        case v if v.contains("text") && v("parse_mode") == "HTML" =>
+        case v if v.contains("parseMode") && "HTML".equalsIgnoreCase(v("parseMode").toString) =>
           json.extract[HtmlAnswer]
         case v if v.contains("text") =>
           json.extract[FlatAnswer]

@@ -1,14 +1,15 @@
-package ru.finagram.api
+package ru.finagram.api.json
 
 import org.json4s.Extraction
 import org.json4s.native.JsonMethods._
 import org.scalatest.{ FreeSpec, Matchers }
+import ru.finagram.api.{ MarkdownAnswer, _ }
 import ru.finagram.test.Utils
 import ru.finagram.test.matchers.Json
 
 import scala.util.Random
 
-class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
+class AnswerSerializerSpec extends FreeSpec with Matchers with Utils {
 
   import ru.finagram.api.json.Implicit.formats
 
@@ -166,7 +167,7 @@ class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
              "text": "$text",
              "parse_mode": "Markdown"
            }
-        """).camelizeKeys.extract[MarkdownAnswer]
+        """).camelizeKeys.extract[Answer]
 
         // then:
         result should be(MarkdownAnswer(
@@ -194,7 +195,7 @@ class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
                "photo": "$photo",
                "caption": "${caption.get}"
             }
-          """).camelizeKeys.extract[PhotoAnswer]
+          """).camelizeKeys.extract[Answer]
 
         // then:
         result should be(PhotoAnswer(
@@ -217,7 +218,7 @@ class AnswerSerializationSpec extends FreeSpec with Matchers with Utils {
                "chat_id": $chatId,
                "sticker": "$sticker"
             }
-          """).camelizeKeys.extract[StickerAnswer]
+          """).camelizeKeys.extract[Answer]
 
         // then:
         result should be(StickerAnswer(

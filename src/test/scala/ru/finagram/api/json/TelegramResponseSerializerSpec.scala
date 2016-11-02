@@ -1,7 +1,8 @@
-package ru.finagram.api
+package ru.finagram.api.json
 
 import org.json4s.native.JsonMethods._
 import org.scalatest.{ FreeSpec, Matchers }
+import ru.finagram.api._
 import ru.finagram.api.json.Implicit.formats
 import ru.finagram.test.Utils
 
