@@ -72,10 +72,10 @@ class TelegramClient(
    * @throws TelegramException when response is not ok (field 'ok' is false).
    * @throws UnexpectedResponseException when parsing of the response was failed.
    */
-  private def extractFromResponse[T](response: Response): T = {
+  private def extractFromResponse[T <: TelegramResponse](response: Response): T = {
     val content = response.contentString
     log.trace(s"Received content: $content")
-    Try(Extraction.decompose(content).snakizeKeys) match {
+    Try(parse(content).camelizeKeys.extract[TelegramResponse]) match {
       case Return(result: T) =>
         result
       case Return(e: TelegramException) =>

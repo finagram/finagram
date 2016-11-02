@@ -4,7 +4,6 @@ import java.io.FileNotFoundException
 import java.nio.file.Paths
 
 import com.twitter.util.Future
-import ru.finagram.!!!
 import ru.finagram.api._
 
 import scala.io.Source
