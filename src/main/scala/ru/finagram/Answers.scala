@@ -2,8 +2,9 @@ package ru.finagram
 
 import java.io.FileNotFoundException
 import java.nio.file.Paths
+import java.util.concurrent.Executors
 
-import com.twitter.util.Future
+import com.twitter.util.{ Future, FuturePool }
 import ru.finagram.api._
 
 import scala.io.Source
@@ -11,6 +12,20 @@ import scala.io.Source
 
 object Answers {
 
+  private val futurePool = FuturePool(Executors.newCachedThreadPool())
+
+  final def text(function: => (String, Option[KeyboardMarkup]))(update: Update): Future[FlatAnswer] = {
+    futurePool(function)
+      .map { case (t, k) =>
+        FlatAnswer(
+          chatId = extractChatId(update),
+          text = t,
+          k
+        )
+      }
+  }
+
+  @deprecated("use method ru.finagram.Answers$#text(scala.Tuple2<java.lang.String,scala.Option<ru.finagram.api.KeyboardMarkup>>, ru.finagram.api.Update)", "0.3.0")
   final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     FlatAnswer(
       chatId = extractChatId(update),
@@ -52,6 +67,16 @@ object Answers {
     )
   }
 
+  private def extractChatId: PartialFunction[Update, Long] = {
+    case MessageUpdate(_, message: Message) =>
+      message.chat.id
+
+    case CallbackQueryUpdate(_, callback) =>
+      callback.from.id
+
+    case v => !!!(s"Not implemented extractChatId for $v")
+  }
+
   /**
    * Read all from resources (if resource with specified path exists) or from file
    * and return text as [[String]].
@@ -73,15 +98,5 @@ object Answers {
 
   final def code(code: String, lang: String = "java") = {
     s"```$lang\n$code\n```"
-  }
-
-  private def extractChatId: PartialFunction[Update, Long] = {
-    case MessageUpdate(_, message: Message) =>
-      message.chat.id
-
-    case CallbackQueryUpdate(_, callback) =>
-      callback.from.id
-
-    case v => !!!(s"Not implemented extractChatId for $v")
   }
 }
