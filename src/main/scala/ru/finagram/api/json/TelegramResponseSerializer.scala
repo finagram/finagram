@@ -3,7 +3,7 @@ package ru.finagram.api.json
 import org.json4s.JsonAST.JObject
 import org.json4s.JsonDSL._
 import org.json4s._
-import ru.finagram.api.{ FileResponse, TelegramException, TelegramResponse, Updates }
+import ru.finagram.api._
 
 object TelegramResponseSerializer extends Serializer[TelegramResponse] {
 
@@ -16,8 +16,10 @@ object TelegramResponseSerializer extends Serializer[TelegramResponse] {
         json \ "result" match {
           case _: JArray =>
             json.extract[Updates]
-          case _: JObject =>
+          case obj: JObject if obj.values.contains("fileId") =>
             json.extract[FileResponse]
+          case obj: JObject if obj.values.contains("id") =>
+            json.extract[MeResponse]
           case _ => ???
         }
       } else {
@@ -26,6 +28,8 @@ object TelegramResponseSerializer extends Serializer[TelegramResponse] {
   }
 
   override def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
+    case me: MeResponse =>
+      ("ok" -> true) ~~ ("result" -> json(me.result))
     case u: Updates =>
       ("ok" -> true) ~~ ("result" -> json(u.result))
     case u: FileResponse =>

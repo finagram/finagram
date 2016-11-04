@@ -19,6 +19,14 @@ lazy val finagram = (project in file("."))
         "uk.co.jemos.podam" % "podam"           % "6.0.4.RELEASE"   % "test",
         "ch.qos.logback"  %   "logback-classic" % "1.1.7"           % "it,test",
         "org.scalatest"   %%  "scalatest"       % "3.0.0"           % "it,test"
-      )
+      ),
+      pomExtra :=
+        <developers>
+          <developer>
+            <id>dokwork</id>
+            <name>Vladimir Popov</name>
+            <url>http://dokwork.ru</url>
+          </developer>
+        </developers>
     )
   )

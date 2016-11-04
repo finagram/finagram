@@ -31,3 +31,7 @@ case class FileResponse(result: File) extends TelegramResponse {
   val ok = true
 }
 
+case class MeResponse(result: User) extends TelegramResponse {
+  val ok = true
+}
+
