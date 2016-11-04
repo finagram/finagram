@@ -6,8 +6,8 @@ lazy val finagram = (project in file("."))
   .settings(
     Seq(
       name := "finagram",
-      version := "0.1.0",
-      organization := "ru.finagram",
+      version := "0.3.0-SNAPSHOT",
+      organization := "com.github.finagram",
       scalaVersion := "2.11.8",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
       libraryDependencies ++= Seq(
