@@ -9,7 +9,7 @@ lazy val finagram = (project in file("."))
       version := "0.3.0-SNAPSHOT",
       organization := "com.github.finagram",
       scalaVersion := "2.11.8",
-      scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings"),
+      scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
       libraryDependencies ++= Seq(
         "org.slf4j"       %   "slf4j-api"       % "1.7.21",
         "com.typesafe"    %   "config"          % "1.3.0",
