@@ -1,6 +1,6 @@
 package ru.finagram.api
 
-import org.json4s.{ DefaultFormats, Extraction }
+import org.json4s.{ DefaultFormats, Extraction, Formats }
 import org.json4s.native.JsonMethods._
 
 package object json {
@@ -17,7 +17,7 @@ package object json {
     implicit val formats = DefaultFormats ++ serializers
   }
 
-  def write(obj: Any): String = {
+  def write(obj: Any)(implicit formats: Formats): String = {
     compact(render(Extraction.decompose(obj).snakizeKeys))
   }
 }
