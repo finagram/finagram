@@ -23,7 +23,7 @@ trait Polling extends MessageReceiver {
    */
   private val timer = new JavaTimer(true)
 
-  private[finagram] lazy val client = new TelegramClient()
+  private[finagram] val client = new TelegramClient()
 
   /**
    * Timeout between requests.

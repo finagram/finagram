@@ -200,7 +200,5 @@ class FinagramBotSpec extends FreeSpec with Matchers with Utils {
 class TestBot extends FinagramBot with MessageReceiver {
   override val token: String = "123-123-123"
 
-  override def run(): Unit = {}
-
   override def close(deadline: Time): Future[Unit] = Future.Unit
 }

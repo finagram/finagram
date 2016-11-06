@@ -20,11 +20,9 @@ class PollingSpec extends FreeSpec with Matchers with Utils {
       val bot = new TestPolling(clientThatReturn(randomUpdatesWithMessage(1)), Some(FlatAnswer(1L, "ping"))) {
         override val timeout = Duration.fromMilliseconds(100L)
       }
-      val t = new Thread(bot)
-      t.setDaemon(true)
 
       // when:
-      t.start()
+      bot.run()
       Thread.sleep(bot.timeout.inMillis * 3)
       Await result bot.close()
 
