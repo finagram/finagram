@@ -40,7 +40,12 @@ trait Polling extends MessageReceiver {
   override final def run(): Unit = {
     isStarted = true
     Await result repeat(poll, 0L)
-    isStopped.setDone()
+      .onSuccess { _ =>
+        isStopped.setDone()
+      }
+      .onFailure{ e =>
+        isStopped.setException(e)
+      }
   }
 
   /**
