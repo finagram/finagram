@@ -16,16 +16,15 @@ object Answers {
 
   final def text(function: => (String, Option[KeyboardMarkup]))(update: Update): Future[FlatAnswer] = {
     futurePool(function)
-      .map { case (t, k) =>
+      .map { case (text, keyboard) =>
         FlatAnswer(
           chatId = extractChatId(update),
-          text = t,
-          k
+          text = text,
+          keyboard
         )
       }
   }
 
-  @deprecated("use method ru.finagram.Answers$#text(scala.Tuple2<java.lang.String,scala.Option<ru.finagram.api.KeyboardMarkup>>, ru.finagram.api.Update)", "0.3.0")
   final def text(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
     FlatAnswer(
       chatId = extractChatId(update),
@@ -40,6 +39,17 @@ object Answers {
       text = text,
       keyboard
     )
+  }
+
+  final def markdown(function: => (String, Option[KeyboardMarkup]))(update: Update) = Future {
+    futurePool(function)
+      .map { case (text, keyboard) =>
+        MarkdownAnswer(
+          chatId = extractChatId(update),
+          text = text,
+          keyboard
+        )
+      }
   }
 
   final def html(text: String, keyboard: Option[KeyboardMarkup] = None)(update: Update) = Future {
