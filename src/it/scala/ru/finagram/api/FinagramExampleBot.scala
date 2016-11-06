@@ -1,5 +1,6 @@
 package ru.finagram.api
 
+import com.twitter.util.Await
 import ru.finagram.Answers._
 import ru.finagram.{ FinagramBot, NotHandledMessageException, Polling }
 
@@ -53,7 +54,7 @@ object FinagramExampleBot extends App with FinagramBot with Polling {
       text("Oops!")(update).map(Some.apply)
   }
 
-  run()
+  Await result run()
 
   /**
    * Default handler for commands without handler.

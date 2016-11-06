@@ -30,30 +30,26 @@ trait Polling extends MessageReceiver {
    */
   val timeout = Duration(700, TimeUnit.MILLISECONDS)
 
-  @volatile
   private var isStarted = false
-  private val isStopped = Promise[Unit]
+  private var process: Future[Unit] = _
 
   /**
    * Run process of get updates from Telegram.
    */
-  override final def run(): Unit = {
+  final def run(): Future[Unit] = synchronized {
     isStarted = true
-    Await result repeat(poll, 0L)
-      .onSuccess { _ =>
-        isStopped.setDone()
-      }
-      .onFailure{ e =>
-        isStopped.setException(e)
-      }
+    process = repeat(poll, 0L)
+    process
   }
 
   /**
    * Stop process of get updates from Telegram.
    */
-  override final def close(deadline: Time): Future[Unit] = closeAwaitably {
-    isStarted = false
-    client.close().join(isStopped).unit
+  override final def close(deadline: Time): Future[Unit] = synchronized {
+    closeAwaitably {
+      isStarted = false
+      process
+    }
   }
 
   /**
@@ -125,7 +121,7 @@ trait Polling extends MessageReceiver {
           repeat(action, init)
       }
     } else {
-      Future.Unit
+      client.close()
     }
   }
 }
