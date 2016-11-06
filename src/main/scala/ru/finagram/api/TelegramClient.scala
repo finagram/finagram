@@ -16,9 +16,19 @@ import scala.reflect.ClassTag
  * Contains methods for issue http requests to Telegram.
  */
 class TelegramClient(
-  http: Service[Request, Response] = Http.client
-    .withTls("api.telegram.org")
-    .newService("api.telegram.org:443")
+  http: Service[Request, Response] = {
+    val isTls = System.getProperty("telegramTls", "true")
+    val host = System.getProperty("telegramHost", "api.telegram.org")
+    val port = System.getProperty("telegramPort", "443")
+    if (isTls.toBoolean) {
+      Http.client
+        .withTls(host)
+        .newService(s"$host:$port")
+    } else {
+      Http.client
+        .newService(s"$host:$port")
+    }
+  }
 ) {
 
   private val log = LoggerFactory.getLogger(getClass)
