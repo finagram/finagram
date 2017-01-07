@@ -1,0 +1,15 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ru.finagram.test.TestExceptionLogFilter" />
+        <encoder>
+            <pattern>%d [%thread] %highlight(%-5level) %cyan(%logger{36}.%method) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="uk.co.jemos.podam" level="ERROR" />
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

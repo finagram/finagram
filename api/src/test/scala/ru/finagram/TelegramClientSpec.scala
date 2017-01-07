@@ -1,14 +1,14 @@
-package ru.finagram.api
+package ru.finagram
 
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.{ Request, Response }
 import com.twitter.util.{ Await, Future }
 import org.json4s.native.JsonMethods._
-import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
+import org.json4s.{ DefaultFormats, Extraction }
 import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
-import ru.finagram.TelegramClient
 import ru.finagram.api.json.TelegramResponseSerializer
+import ru.finagram.api.{ MessageUpdate, TelegramException, TelegramResponse, Updates }
 import ru.finagram.test.Utils
 
 import scala.util.Random

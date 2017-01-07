@@ -19,5 +19,3 @@ Answers is the messages that your bot should send to telegram user.
 
 ## Answers
 ![Class diagram](http://www.plantuml.com/plantuml/png/tPJDIiGm58NtUOeymFG52Wgw44LdBCo02-aYJMzdmiGa97UiW_hkDjFIfYt5-hCGkoda76xETsyIeH1imJZG2-LAiFILqEhZEuOtUKpljDgU5dBXM2PXfL4KWZCKMiNqtlZ_uwNM4fXAJqOBHXutUWdEiItu6etBbmeiIsRt1zEgjt3CDBDvlPoITq946sq3BzYBXzL2JDTeHJ_U0sH9jMjYuLb0EGvOLUMIEKUl90ih3d07vUVadHrXTYi_QMIBuXFakbGJE8i1p-AF0b7Q8LtZa_mdqqbs6lKqY_5o0CEPwUrO2-bNCNyuYZEwqWewY3KAlWSxZU5gmtUdyajngoD4WgSYab1Wz7RUl6makFFHmNYXCvF1BHeRWZCv5iCfDsgZz5lNqpu0)
-
-## Types

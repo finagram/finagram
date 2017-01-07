@@ -6,14 +6,14 @@ import org.json4s.JsonAST.{ JObject, _ }
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{ FunSpecLike, Matchers }
+import org.scalatest.{ FreeSpec, Matchers }
 import ru.finagram.api._
 import ru.finagram.test.Utils
 import uk.co.jemos.podam.api.{ AbstractRandomDataProviderStrategy, AttributeMetadata, PodamFactoryImpl }
 
 import scala.util.Random
 
-class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
+class MessageSerializerSpec extends FreeSpec with Matchers with Utils {
 
   implicit val formats = DefaultFormats + MessageSerializer
 
@@ -27,8 +27,8 @@ class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
   val randomPhotoMessage = random[PhotoMessage]
   val randomVoiceMessage = random[VoiceMessage]
 
-  describe("serialize message to json") {
-    it(s"should create JObject for text message only with expected fields") {
+  "serialize message to json" - {
+    s"should create JObject for text message only with expected fields" in {
       // given:
       val msg = randomTextMessage
 
@@ -47,7 +47,7 @@ class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
         case _ => throw new Exception(s"Wrong json:\n$json")
       }
     }
-    it(s"should create expected JObject for text message without 'user'") {
+    s"should create expected JObject for text message without 'user'" in {
       // given:
       val msg = random[TextMessage].copy(from = None)
 
@@ -65,6 +65,7 @@ class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
         case _ => throw new Exception(s"Wrong json:\n$json")
       }
     }
+
     val messages = Table[Message, String, Class[_ <: JValue]](
       ("Message", "Expected custom field", ""),
       (randomDocumentMessage, "document", classOf[JObject]),
@@ -75,7 +76,7 @@ class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
       (randomVoiceMessage, "voice", classOf[JObject])
     )
     forAll(messages) { (msg, field, clazz) =>
-      it(s"should create expected JObject with field $field") {
+      s"should create expected JObject with field $field" in {
         // when:
         val json = Extraction.decompose(msg).snakizeKeys
 
@@ -97,7 +98,7 @@ class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
     }
   }
 
-  describe(s"deserialize message from json string") {
+  s"deserialize message from json string" - {
 
     val messages = Table[Message, String, String](
       ("Message", "Content field name", "Content field value"),
@@ -111,7 +112,7 @@ class MessageSerializerSpec extends FunSpecLike with Matchers with Utils {
     )
 
     forAll(messages) { (message, fieldName, fieldValue) =>
-      it(s"should deserialize ${message.getClass}") {
+      s"should deserialize ${message.getClass}" in {
         // given:
         val str =
           s"""

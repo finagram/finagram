@@ -29,6 +29,7 @@ class InlineKeyboard {
     val text = tuple._1
     val data = tuple._2.toString
     val answer = data.toLowerCase
+    // FIXME replace to Try(new URL)
     if (answer.startsWith("http://") || answer.startsWith("https://")) {
       InlineUrlKeyboardButton(text, data)
     } else {
