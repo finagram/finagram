@@ -7,6 +7,7 @@ import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction, FieldSerializer }
 import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
+import ru.finagram.TelegramClient
 import ru.finagram.api.json.TelegramResponseSerializer
 import ru.finagram.test.Utils
 

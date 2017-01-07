@@ -1,14 +1,13 @@
-package ru.finagram.api
+package ru.finagram
 
 import com.twitter.finagle.http.Method.Post
 import com.twitter.finagle.http.{ Method, Request, Response }
 import com.twitter.finagle.{ Http, Service }
 import com.twitter.util.{ Future, Return, Throw, Try }
-import org.json4s.{ DefaultFormats, Extraction }
+import org.json4s.Extraction
 import org.json4s.native.JsonMethods._
 import org.slf4j.LoggerFactory
-import ru.finagram.UnexpectedResponseException
-import ru.finagram.api.json.{ AnswerSerializer, TelegramResponseSerializer }
+import ru.finagram.api._
 
 import scala.reflect.ClassTag
 

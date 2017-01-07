@@ -78,11 +78,11 @@ PhotoSize  -up-|> Message
 StickerMessage -up-|> Message
 
 class CallbackQuery {
-  id: String,
-  from: User,
-  data: String,
-  message: Option[Message] = None,
-  inlineMessageId: Option[String] = None
+  id: String
+  from: User
+  data: String
+  message: Option[Message]
+  inlineMessageId: Option[String]
 }
 
 @enduml
