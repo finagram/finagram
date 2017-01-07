@@ -30,8 +30,9 @@ trait Polling extends MessageReceiver {
    */
   val timeout = Duration(700, TimeUnit.MILLISECONDS)
 
+  @volatile
   private var isStarted = false
-  private var process: Future[Unit] = _
+  private var process: Future[Unit] = Future.Unit
 
   /**
    * Run process of get updates from Telegram.

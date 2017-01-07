@@ -4,24 +4,44 @@ interface TelegramResponse {
     ok: Boolean
 }
 
+class FileResponse {
+    result: File
+}
+
+class MeResponse {
+    result: User
+}
+
 class TelegramException {
     description: String
     errorCode: Option[Int]
-}
-
-class Update {
-    updateId: Long
-    message: Option[Message]
 }
 
 class Updates {
     result: Seq[Update]
 }
 
+interface Update {
+    updateId: Long
+}
+
+class MessageUpdate {
+    message: Option[Message]
+}
+
+class CallbackQueryUpdate {
+    callbackQuery: CallbackQuery
+}
+
 TelegramException -up-|> TelegramResponse
+FileResponse -up-|> TelegramResponse
+MeResponse -up-|> TelegramResponse
 Updates -up-|> TelegramResponse
 Updates *-down- Update
-Update *- Message
+MessageUpdate -right-|> Update
+MessageUpdate *-down- Message
+CallbackQueryUpdate -left-|> Update
+CallbackQueryUpdate *-down- CallbackQuery
 
 interface Message {
    messageId: Long
@@ -56,5 +76,13 @@ class TextMessage {
 TextMessage -up-|> Message
 PhotoSize  -up-|> Message
 StickerMessage -up-|> Message
+
+class CallbackQuery {
+  id: String,
+  from: User,
+  data: String,
+  message: Option[Message] = None,
+  inlineMessageId: Option[String] = None
+}
 
 @enduml
