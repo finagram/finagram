@@ -76,18 +76,19 @@ class TelegramClientSpec extends FreeSpec with Matchers with Utils {
     }
     "when send answer with text message" - {
       val answer = random[FlatAnswer]
-      "should issue POST to /bot<token>/sendMessage"
-      val http = mock[Service[Request, Response]]
-      val client = new TelegramClient(http)
-      // when:
-      client.sendAnswer(randomToken, answer)
-      // then:
-      val request = argumentCaptor[Request]
-      verify(http).apply(request.capture())
-      request.getValue.contentString should be(Json(
-        """
+      "should issue POST to /bot<token>/sendMessage" in {
+        val http = mock[Service[Request, Response]]
+        val client = new TelegramClient(http)
+        // when:
+        client.sendAnswer(randomToken, answer)
+        // then:
+        val request = argumentCaptor[Request]
+        verify(http).apply(request.capture())
+        request.getValue.contentString should be(Json(
+          """
           |
         """.stripMargin))
+      }
     }
   }
 

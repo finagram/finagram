@@ -11,13 +11,14 @@ import scala.language.higherKinds
 
 object Json {
 
-  def apply(right: String)(implicit formats: Formats): BeMatcher[JValue] =
-    new BeMatcher[JValue] {
-      def apply(left: JValue): MatchResult = {
+  def apply(right: String)(implicit formats: Formats): BeMatcher[String] =
+    new BeMatcher[String] {
+      def apply(left: String): MatchResult = {
+        val jleft = parse(left)
         val jright = parse(right)
         MatchResult(
-          left == jright,
-          rawFailureMessage(left, jright),
+          jleft == jright,
+          rawFailureMessage(jleft, jright),
           s"$left\nwas equals to\n$jright"
         )
       }
@@ -55,19 +56,19 @@ class JsonSpec extends FreeSpec with Matchers {
   "Json matcher" - {
     "should not throws exception when string contains expected json" in {
       // given:
-      val actual = parse(json)
+      val actual = json
       // when:
       actual should be(Json(json))
     }
     "should print absent part of expected json" in {
       // given:
-      val actual = parse(
+      val actual =
         """
           |{
           |  "value": 1,
           |  "field": "Hello"
           |}
-        """.stripMargin)
+        """.stripMargin
       // when:
       try {
         actual should be(Json(json))
@@ -82,7 +83,7 @@ class JsonSpec extends FreeSpec with Matchers {
     }
     "should print added part of json" in {
       // given:
-      val actual = parse(
+      val actual =
         """
           |{
           |  "value": 1,
@@ -90,7 +91,7 @@ class JsonSpec extends FreeSpec with Matchers {
           |  "field": "Hello",
           |  "new": "Not expected part"
           |}
-        """.stripMargin)
+        """.stripMargin
       // when:
       try {
         actual should be(Json(json))
@@ -105,14 +106,14 @@ class JsonSpec extends FreeSpec with Matchers {
     }
     "should print different part of json" in {
       // given:
-      val actual = parse(
+      val actual =
         """
           |{
           |  "value": 2,
           |  "array": [1,2,3],
           |  "field": "Hello",
           |}
-        """.stripMargin)
+        """.stripMargin
       // when:
       try {
         actual should be(Json(json))

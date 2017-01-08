@@ -22,7 +22,7 @@ class AnswerSerializerSpec extends FreeSpec with Matchers with Utils {
         val answer = FlatAnswer(id, text)
 
         // when:
-        val result = Extraction.decompose(answer).snakizeKeys
+        val result = write(answer)
 
         // then:
         result should be(
@@ -50,7 +50,7 @@ class AnswerSerializerSpec extends FreeSpec with Matchers with Utils {
         )
 
         // when:
-        val result = Extraction.decompose(answer).snakizeKeys
+        val result = write(answer)
 
         // then:
         result should be(
@@ -76,7 +76,7 @@ class AnswerSerializerSpec extends FreeSpec with Matchers with Utils {
         val answer = HtmlAnswer(id, text)
 
         // when:
-        val result = Extraction.decompose(answer).snakizeKeys
+        val result = write(answer)
 
         // then:
         result should be(
@@ -102,7 +102,7 @@ class AnswerSerializerSpec extends FreeSpec with Matchers with Utils {
         )
 
         // when:
-        val result = Extraction.decompose(answer).snakizeKeys
+        val result = write(answer)
 
         // then:
         result should be(
@@ -128,7 +128,7 @@ class AnswerSerializerSpec extends FreeSpec with Matchers with Utils {
         )
 
         // when:
-        val result = Extraction.decompose(answer).snakizeKeys
+        val result = write(answer)
 
         // then:
         result should be(

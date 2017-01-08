@@ -257,7 +257,7 @@ class TelegramResponseSerializerSpec extends FreeSpec with Matchers with Utils {
         val response = MeResponse(user)
 
         // when:
-        val result = Extraction.decompose(response).snakizeKeys
+        val result = write(response)
 
         // then:
         result should be(
