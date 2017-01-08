@@ -3,12 +3,11 @@ package ru.finagram.test.matchers
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.write
 import org.json4s.{ DefaultFormats, Diff, Formats, JValue }
-import org.scalatest.{ FreeSpec, Matchers }
 import org.scalatest.matchers._
+import org.scalatest.{ FreeSpec, Matchers }
 
 import scala.language.experimental.macros
 import scala.language.higherKinds
-import scala.util.Try
 
 object Json {
 

@@ -1,22 +1,25 @@
 package ru.finagram
 
 import com.twitter.finagle.Service
-import com.twitter.finagle.http.{ Request, Response }
+import com.twitter.finagle.http.{ Request, Response, Statuses }
 import com.twitter.util.{ Await, Future }
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
 import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
 import ru.finagram.api.json.TelegramResponseSerializer
-import ru.finagram.api.{ MessageUpdate, TelegramException, TelegramResponse, Updates }
+import ru.finagram.api._
 import ru.finagram.test.Utils
+import ru.finagram.test.matchers.Json
 
 import scala.util.Random
 
 class TelegramClientSpec extends FreeSpec with Matchers with Utils {
 
+  implicit val formats = DefaultFormats
+
   "Telegram client" - {
-    "when getUpdates" - {
+    "when get updates" - {
       "should issue GET to /bot<token>/getUpdates with offset and limit" in {
         // given:
         val token = randomToken
@@ -49,6 +52,16 @@ class TelegramClientSpec extends FreeSpec with Matchers with Utils {
         // then:
         result should contain allElementsOf updates.result
       }
+      s"should throw ${classOf[UnexpectedResponseException]} when Telegram return response with status != 200" in {
+        // given:
+        val http = clientWithResponse(Response(Statuses.BAD_REQUEST))
+        val client = new TelegramClient(http)
+
+        intercept[UnexpectedResponseException] {
+          // when:
+          Await result client.getUpdates(randomToken, 1L)
+        }
+      }
       s"should throw ${classOf[TelegramException]} when Telegram return response with 'ok' = false" in {
         // given:
         val exception = TelegramException("Example", Some(-1))
@@ -61,19 +74,21 @@ class TelegramClientSpec extends FreeSpec with Matchers with Utils {
         }
       }
     }
-  }
-
-  private def randomToken = Random.nextString(10)
-
-  private def toJsonString(response: TelegramResponse): String = {
-    implicit val formats = DefaultFormats + TelegramResponseSerializer
-    val str = compact(render(Extraction.decompose(response).snakizeKeys))
-    str
-  }
-
-  private def randomUpdatesWithMessage(count: Int): Updates = {
-    val k = Random.nextInt(100)
-    Updates((1 to count).map(i => random[MessageUpdate].copy(updateId = i * k)))
+    "when send answer with text message" - {
+      val answer = random[FlatAnswer]
+      "should issue POST to /bot<token>/sendMessage"
+      val http = mock[Service[Request, Response]]
+      val client = new TelegramClient(http)
+      // when:
+      client.sendAnswer(randomToken, answer)
+      // then:
+      val request = argumentCaptor[Request]
+      verify(http).apply(request.capture())
+      request.getValue.contentString should be(Json(
+        """
+          |
+        """.stripMargin))
+    }
   }
 
   def clientWithResponse(response: Response): Service[Request, Response] = {
@@ -87,5 +102,18 @@ class TelegramClientSpec extends FreeSpec with Matchers with Utils {
     response.setContentTypeJson()
     response.contentString = content
     response
+  }
+
+  private def randomToken = Random.nextString(10)
+
+  private def toJsonString(response: TelegramResponse): String = {
+    implicit val formats = DefaultFormats + TelegramResponseSerializer
+    val str = compact(render(Extraction.decompose(response).snakizeKeys))
+    str
+  }
+
+  private def randomUpdatesWithMessage(count: Int): Updates = {
+    val k = Random.nextInt(100)
+    Updates((1 to count).map(i => random[MessageUpdate].copy(updateId = i * k)))
   }
 }
