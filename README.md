@@ -1,4 +1,4 @@
-# Finagram API [![Build Status](https://travis-ci.org/finagram/finagram-api.svg?branch=master)](https://travis-ci.org/finagram/finagram-api) [![](https://jitpack.io/v/finagram/finagram-api.svg)](https://jitpack.io/#finagram/finagram-api) [![Coverage Status](https://coveralls.io/repos/github/finagram/finagram-api/badge.svg?branch=master)](https://coveralls.io/github/finagram/finagram-api?branch=master)
+# Finagram API [![Build Status](https://travis-ci.org/finagram/finagram.svg?branch=master)](https://travis-ci.org/finagram/finagram) [![](https://jitpack.io/v/finagram/finagram.svg)](https://jitpack.io/#finagram/finagram) [![Coverage Status](https://coveralls.io/repos/github/finagram/finagram/badge.svg?branch=master)](https://coveralls.io/github/finagram/finagram?branch=master)
 
 
 This library give you set of scala classes that represent [Telegram Bot API](https://core.telegram.org/bots/api).
@@ -40,11 +40,11 @@ If you doesn't want run web server for receive webhooks, you can use `ru.finagra
 receive updates from Telegram by long polling.
 
 This class take two main parameters as arguments of the constructor: _token_ and _updatesHandler_.
-First is your Telegram token, second is function, that take update and return result of the 
+First is your Telegram token, second is a function, that take update and return result of the 
 handling update as [Future[Unit]](https://twitter.github.io/finagle/guide/Futures.html).
 
 For begin receive updates you should invoke method `run` that can take number of the offset which
-will been used in the first updates request. 
+will used in the first updates request. 
 
 For break receiving you should invoke method `close`.
 
@@ -94,4 +94,23 @@ The second is answers is the messages that your want to send to the telegram use
 ## How convert Twitter Future to Scala Future
 
 Unfortunately `com.twitter.util.Future` is not compatible with `scala.concurrent.Future`, but you 
-can use [bijection](https://github.com/twitter/bijection) project for convert one into another.
+can use [bijection](https://github.com/twitter/bijection) project for easy convert one into another:
+```scala
+import com.twitter.bijection.Conversion.asMethod
+import com.twitter.bijection.twitter_util.UtilBijections._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import com.twitter.util.{ Future => TwitterFuture }
+import scala.concurrent.{ Future => ScalaFuture }
+
+// From twitter future to scala future:
+val scalaFuture: ScalaFuture[Unit] = TwitterFuture.Unit.as[ScalaFuture[Unit]]
+// or in another way:
+val twitterFuture: TwitterFuture[Unit] = ScalaFuture.successful(()).as[TwitterFuture[Unit]]
+```
+Finagram does not contains bijections as dependency. If you want use it, you should add it 
+directly:
+```
+libraryDependencies += "com.twitter" %% "bijection-util" % "<actual version>"
+```
