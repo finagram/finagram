@@ -17,7 +17,7 @@ resolvers += "jitpack" at "https://jitpack.io"
 Step 2. Add the dependency
 
 ```
-libraryDependencies += "com.github.finagram" % "finagram-api" % "0.1.0"	
+libraryDependencies += "com.github.finagram" % "finagram" % "0.3.0"	
 ```
 
 ## How issue requests to the Telegram api 
