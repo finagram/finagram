@@ -24,9 +24,13 @@ before_cache:
 jdk:
   - oraclejdk8
 
+script:
+  - sbt clean coverage test
+
+after_success:
+  - sbt coverageReport coveralls
+
 notifications:
   email:
     recipients:
       - vladimir@dokwork.ru
-
-
