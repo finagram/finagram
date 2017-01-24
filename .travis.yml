@@ -5,6 +5,7 @@ language: scala
 
 scala:
    - 2.11.8
+   - 2.12.0
 
 branches:
     - master
@@ -24,9 +25,13 @@ before_cache:
 jdk:
   - oraclejdk8
 
+script:
+  - sbt clean coverage test
+
+after_success:
+  - sbt coverageReport coveralls
+
 notifications:
   email:
     recipients:
       - vladimir@dokwork.ru
-
-

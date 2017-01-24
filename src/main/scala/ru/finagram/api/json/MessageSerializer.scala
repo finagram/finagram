@@ -1,8 +1,10 @@
-package ru.finagram.api
+package ru.finagram.api.json
 
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.{ DefaultFormats, Extraction, Formats, JValue, Serializer, TypeInfo }
+import ru.finagram.api._
+import ru.finagram.!!!
 
 object MessageSerializer extends Serializer[Message] {
 
@@ -25,8 +27,7 @@ object MessageSerializer extends Serializer[Message] {
           json.extract[StickerMessage]
         case v if v.contains("text") =>
           json.extract[TextMessage]
-        case _ =>
-          ???
+        case v => !!!(s"Not implement deserialization for $v")
       }
   }
 
@@ -37,8 +38,8 @@ object MessageSerializer extends Serializer[Message] {
       JMessage(m) ~~ ("voice" -> json(m.voice))
     case m: PhotoMessage =>
       JMessage(m) ~~ ("photo" -> json(m.photo))
-    case m: DocumentMessage =>
-      JMessage(m) ~~ ("location" -> json(m.document))
+    case m: LocationMessage =>
+      JMessage(m) ~~ ("location" -> json(m.location))
     case m: DocumentMessage =>
       JMessage(m) ~~ ("document" -> json(m.document))
     case m: StickerMessage =>

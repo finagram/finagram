@@ -1,12 +1,15 @@
 package ru.finagram.api
 
+import java.net.{ MalformedURLException, URL }
+
 import scala.collection.mutable
 
 class InlineKeyboard {
 
   private val keyboards = mutable.Buffer[Seq[InlineKeyboardButton]]()
 
-  def buttons(row: (String, String)*): InlineKeyboard = {
+  @throws(clazz = classOf[MalformedURLException])
+  def buttons(row: (String, Any)*): InlineKeyboard = {
     buttons(row.map(buttonFromTuple))
   }
 
@@ -21,19 +24,24 @@ class InlineKeyboard {
 
   def createOpt(): Option[InlineKeyboardMarkup] = Some(create())
 
-  private def buttonFromTuple(tuple: (String, String)): InlineKeyboardButton = {
-    val answer = tuple._2.toLowerCase
+  @throws(clazz = classOf[MalformedURLException])
+  private def buttonFromTuple(tuple: (String, Any)): InlineKeyboardButton = {
+    val text = tuple._1
+    val data = tuple._2.toString
+    val answer = data.toLowerCase
+    // FIXME replace to Try(new URL)
     if (answer.startsWith("http://") || answer.startsWith("https://")) {
-      InlineUrlKeyboardButton(tuple._1, tuple._2)
+      InlineUrlKeyboardButton(text, data)
     } else {
-      InlineCallbackKeyboardButton(tuple._1, tuple._2)
+      InlineCallbackKeyboardButton(text, data)
     }
   }
 }
 
 object InlineKeyboard {
 
-  def apply(row: (String, String)*): InlineKeyboardMarkup = {
+  @throws(clazz = classOf[MalformedURLException])
+  def apply(row: (String, Any)*): InlineKeyboardMarkup = {
     new InlineKeyboard()
       .buttons(row: _*)
       .create()

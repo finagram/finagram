@@ -3,7 +3,7 @@ package ru.finagram.api
 /**
  * This trait represents an incoming update.
  */
-sealed trait Update {
+trait Update {
   val updateId: Long
 }
 
@@ -23,3 +23,6 @@ case class MessageUpdate(updateId: Long, message: Message) extends Update
  * @param callbackQuery New incoming callback query.
  */
 case class CallbackQueryUpdate(updateId: Long, callbackQuery: CallbackQuery) extends Update
+
+
+

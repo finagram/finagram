@@ -41,7 +41,7 @@ package object api {
    */
   case class PhotoSize(fileId: String, width: Int, height: Int, fileSize: Option[Int])
 
-  trait IFile {
+  trait Binary {
     val fileId: String
   }
 
@@ -59,10 +59,10 @@ package object api {
     fileId: String,
     width: Int,
     height: Int,
-    thumb: Option[PhotoSize],
-    emoji: Option[String],
-    fileSize: Option[Int]
-  ) extends IFile
+    thumb: Option[PhotoSize] = None,
+    emoji: Option[String] = None,
+    fileSize: Option[Int] = None
+  ) extends Binary
 
   /**
    * Document.
@@ -79,7 +79,7 @@ package object api {
     fileName: Option[String] = None,
     mimeType: Option[String] = None,
     fileSize: Option[Int] = None
-  ) extends IFile
+  ) extends Binary
 
   /**
    * Location.
@@ -111,7 +111,7 @@ package object api {
     thumb: Option[PhotoSize] = None,
     mimeType: Option[String] = None,
     fileSize: Option[Int] = None
-  ) extends IFile
+  ) extends Binary
 
   /**
    * Voice
@@ -126,7 +126,7 @@ package object api {
     duration: Int,
     mimeType: Option[String],
     fileSize: Option[Int]
-  ) extends IFile
+  ) extends Binary
 
   /**
    * File.

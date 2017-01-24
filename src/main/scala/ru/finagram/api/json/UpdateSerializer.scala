@@ -1,8 +1,10 @@
-package ru.finagram.api
+package ru.finagram.api.json
 
-import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JObject
+import org.json4s.JsonDSL._
 import org.json4s.{ DefaultFormats, Extraction, Formats, JValue, Serializer, TypeInfo }
+import ru.finagram.api.{ CallbackQueryUpdate, MessageUpdate, Update }
+import ru.finagram.!!!
 
 object UpdateSerializer extends Serializer[Update] {
 
@@ -15,8 +17,7 @@ object UpdateSerializer extends Serializer[Update] {
           json.extract[MessageUpdate]
         case v if v.contains("callbackQuery") =>
           json.extract[CallbackQueryUpdate]
-        case _ =>
-          ???
+        case v => !!!(s"Not implemented deserialization for $v")
       }
   }
 

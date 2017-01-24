@@ -1,32 +1,10 @@
 package ru.finagram.api
 
-import org.json4s._
-import org.json4s.native.JsonMethods._
-
 /**
  * Response from Telegram on request.
  */
 sealed trait TelegramResponse {
   val ok: Boolean
-}
-
-object TelegramResponse {
-  implicit val formats = DefaultFormats + UpdateSerializer + MessageSerializer
-
-  def apply(content: String): TelegramResponse = {
-    val json = parse(content).camelizeKeys
-    val ok = (json \ "ok").extract[Boolean]
-    if (ok) {
-      (json \ "result") match {
-        case _: JArray =>
-          json.extract[Updates]
-        case _: JObject =>
-          json.extract[FileResponse]
-      }
-    } else {
-      json.extract[TelegramException]
-    }
-  }
 }
 
 /**
@@ -50,6 +28,10 @@ case class Updates(result: Seq[Update]) extends TelegramResponse {
 }
 
 case class FileResponse(result: File) extends TelegramResponse {
+  val ok = true
+}
+
+case class MeResponse(result: User) extends TelegramResponse {
   val ok = true
 }
 
