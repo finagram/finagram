@@ -1,5 +1,3 @@
-import sbt.Keys._
-
 name := "finagram"
 version := "0.3.0"
 organization := "com.github.finagram"
