@@ -6,15 +6,15 @@ import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
 import org.slf4j.LoggerFactory
 import ru.finagram.api._
-import ru.finagram.test.{ MockitoSugar, Podam, TestException }
+import ru.finagram.test.{ MockitoSugar, RandomDataGenerator, TestException }
 
 import scala.util.Random
 
-class PollingServerSpec extends FreeSpec with Matchers with MockitoSugar with Podam {
+class PollingServerSpec extends FreeSpec with Matchers with MockitoSugar with RandomDataGenerator {
 
   private val log = LoggerFactory.getLogger(getClass)
 
-  val token = randomString()
+  private val token = randomString()
 
   "Long polling" - {
     "should issue requests to Telegram at least two times for timeout x 3 period" in {

@@ -9,12 +9,12 @@ import org.mockito.Mockito._
 import org.scalatest.{ FreeSpec, Matchers }
 import ru.finagram.api.json.TelegramResponseSerializer
 import ru.finagram.api._
-import ru.finagram.test.{ MockitoSugar, Podam }
+import ru.finagram.test.{ MockitoSugar, RandomDataGenerator }
 import ru.finagram.test.matchers.Json
 
 import scala.util.Random
 
-class TelegramClientSpec extends FreeSpec with Matchers with MockitoSugar with Podam {
+class TelegramClientSpec extends FreeSpec with Matchers with MockitoSugar with RandomDataGenerator {
 
   implicit val formats = DefaultFormats
 

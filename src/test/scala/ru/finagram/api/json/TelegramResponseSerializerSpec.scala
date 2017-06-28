@@ -4,12 +4,21 @@ import org.json4s.Extraction
 import org.json4s.native.JsonMethods._
 import org.scalatest.{ FreeSpec, Matchers }
 import ru.finagram.api._
-import ru.finagram.test.{ MockitoSugar, Podam }
+import ru.finagram.test.{ MockitoSugar, RandomDataGenerator }
 import ru.finagram.test.matchers.Json
 
-class TelegramResponseSerializerSpec extends FreeSpec with Matchers with MockitoSugar with Podam {
+class TelegramResponseSerializerSpec extends FreeSpec with Matchers with MockitoSugar with RandomDataGenerator {
 
   import ru.finagram.api.json.Implicit.formats
+
+  implicit val arbUser = arbitrary(
+    User(
+      id = random[Int],
+      firstName = random[String],
+      lastName = Some(random[String]),
+      username = Some(random[String])
+    )
+  )
 
   "deserialization" - {
     "parse json with Telegram error" - {

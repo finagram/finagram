@@ -1,31 +1,27 @@
 package ru.finagram.api.json
 
-import java.util.UUID
-
 import org.json4s.JsonAST.{ JObject, _ }
 import org.json4s.native.JsonMethods._
 import org.json4s.{ DefaultFormats, Extraction }
+import org.scalacheck.Arbitrary
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{ FreeSpec, Matchers }
 import ru.finagram.api._
-import ru.finagram.test.{ MockitoSugar, Podam }
-import uk.co.jemos.podam.api.{ AbstractRandomDataProviderStrategy, AttributeMetadata, PodamFactoryImpl }
+import ru.finagram.test.{ MockitoSugar, RandomDataGenerator }
 
-import scala.util.Random
-
-class MessageSerializerSpec extends FreeSpec with Matchers with MockitoSugar with Podam {
+class MessageSerializerSpec extends FreeSpec with Matchers with MockitoSugar with RandomDataGenerator {
 
   implicit val formats = DefaultFormats + MessageSerializer
 
-  override val factory = new PodamFactoryImpl(CustomProviderStrategy)
+  implicit val arbUser: Arbitrary[Option[User]] = arbitrary(Some(random[User]))
 
-  val randomTextMessage = random[TextMessage]
-  val randomDocumentMessage = random[DocumentMessage]
-  val randomLocationMessage = random[LocationMessage]
-  val randomStickerMessage = random[StickerMessage]
-  val randomVideoMessage = random[VideoMessage]
-  val randomPhotoMessage = random[PhotoMessage]
-  val randomVoiceMessage = random[VoiceMessage]
+  private val randomTextMessage = random[TextMessage]
+  private val randomDocumentMessage = random[DocumentMessage]
+  private val randomLocationMessage = random[LocationMessage]
+  private val randomStickerMessage = random[StickerMessage]
+  private val randomVideoMessage = random[VideoMessage]
+  private val randomPhotoMessage = random[PhotoMessage]
+  private val randomVoiceMessage = random[VoiceMessage]
 
   "serialize message to json" - {
     s"should create JObject for text message only with expected fields" in {
@@ -92,7 +88,16 @@ class MessageSerializerSpec extends FreeSpec with Matchers with MockitoSugar wit
             c.getClass should be(clazz)
 
           case _ =>
-            throw new Exception(s"Wrong json:\n${pretty(render(json))}")
+            throw new Exception(s"Wrong json:\n$json\nExpected:" +
+                                s"""
+                                  |JObject(Seq(
+                                  |          JField("message_id", JInt(_)),
+                                  |          JField("chat", JObject(_)),
+                                  |          JField("date", JInt(_)),
+                                  |          JField("from", JObject(_)),
+                                  |          JField($field, $clazz)
+                                  |          ))
+                                """.stripMargin)
         }
       }
     }
@@ -135,19 +140,4 @@ class MessageSerializerSpec extends FreeSpec with Matchers with MockitoSugar wit
   }
 
   private def write(obj: AnyRef): String = compact(render(Extraction.decompose(obj).snakizeKeys))
-
-  private object CustomProviderStrategy extends AbstractRandomDataProviderStrategy {
-    override def getStringValue(attributeMetadata: AttributeMetadata): String = UUID.randomUUID().toString
-
-    override def getMemoizedObject(attributeMetadata: AttributeMetadata): AnyRef = {
-      // HACK: Class with field Option[Int] after compilation will contain field Option[Object]
-      // and original type will be lost. This holds for every of primitive types.
-      // Change Option[Object] to Option[Int] enough to success, but only for this test class.
-      if (attributeMetadata.getAttrGenericArgs.contains(classOf[Object]))
-        Some(Random.nextInt(100))
-      else
-        super.getMemoizedObject(attributeMetadata)
-    }
-  }
-
 }
