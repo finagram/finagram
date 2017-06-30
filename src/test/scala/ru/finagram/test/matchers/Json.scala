@@ -132,7 +132,7 @@ class JsonSpec extends FreeSpec with Matchers {
             """|Not expected json:
                |Fields [value, field] were changed.
                |Expected: [{"value":1},{"field":"Hello"}]
-               |Actual: [{"value":2},{"field":"By!"}]""".stripMargin)
+               |Actual: [{"value":2},{"field":"Bye!"}]""".stripMargin)
       }
     }
   }
