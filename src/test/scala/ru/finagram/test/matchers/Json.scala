@@ -7,8 +7,6 @@ import org.json4s.{ DefaultFormats, Diff, Formats, JValue }
 import org.scalatest.matchers._
 import org.scalatest.{ FreeSpec, Matchers }
 
-import scala.language.experimental.macros
-import scala.language.higherKinds
 
 object Json {
 
