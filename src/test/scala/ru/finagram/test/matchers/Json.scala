@@ -119,7 +119,7 @@ class JsonSpec extends FreeSpec with Matchers {
           |{
           |  "value": 2,
           |  "array": [1,2,3],
-          |  "field": "By!",
+          |  "field": "Bye!",
           |}
         """.stripMargin
       // when:
