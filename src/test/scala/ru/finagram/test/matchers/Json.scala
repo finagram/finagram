@@ -1,5 +1,6 @@
 package ru.finagram.test.matchers
 
+import org.json4s.JsonAST.JObject
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.write
 import org.json4s.{ DefaultFormats, Diff, Formats, JValue }
@@ -29,8 +30,17 @@ object Json {
   private def rawFailureMessage(left: JValue, right: JValue)(implicit formats: Formats): String = {
     val Diff(changed, added, deleted) = right diff left
     val result = new StringBuilder(s"Not expected json:\n")
-    if (changed.toOption.isDefined)
-      result ++= s"Field changed:\n${write(changed)}\n"
+    changed match {
+      case JObject(fields) =>
+        val names = fields.map(_._1)
+        val expected = right.filterField { case (name, _) => names.contains(name) }
+        val actual = fields
+        result ++=
+          s"""Fields [${names.mkString(", ")}] were changed.
+             |Expected: ${write(expected)}
+             |Actual: ${write(actual)}""".stripMargin
+      case _ =>
+    }
     if (deleted.toOption.isDefined)
       result ++= s"Absent part:\n${write(deleted)}\n"
     if (added.toOption.isDefined)
@@ -111,7 +121,7 @@ class JsonSpec extends FreeSpec with Matchers {
           |{
           |  "value": 2,
           |  "array": [1,2,3],
-          |  "field": "Hello",
+          |  "field": "By!",
           |}
         """.stripMargin
       // when:
@@ -119,11 +129,12 @@ class JsonSpec extends FreeSpec with Matchers {
         actual should be(Json(json))
       } catch {
         case e: Throwable =>
+          println(e.getMessage)
           e.getMessage should be(
             """|Not expected json:
-               |Field changed:
-               |{"value":2}
-               |""".stripMargin)
+               |Fields [value, field] were changed.
+               |Expected: [{"value":1},{"field":"Hello"}]
+               |Actual: [{"value":2},{"field":"By!"}]""".stripMargin)
       }
     }
   }
