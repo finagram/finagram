@@ -2,9 +2,8 @@ name := "finagram"
 version := "0.3.0"
 organization := "com.github.finagram"
 scalaVersion := "2.11.8"
-crossScalaVersions := Seq("2.11.8", "2.12.0")
+crossScalaVersions := Seq("2.11.11", "2.12.3")
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings")
-resolvers += "jitpack" at "https://jitpack.io"
 libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-api" % "1.7.21",
   "com.typesafe" % "config" % "1.3.0",
@@ -21,6 +20,6 @@ pomExtra :=
     <developer>
       <id>dokwork</id>
       <name>Vladimir Popov</name>
-      <url>http://dokwork.ru</url>
+      <url>http://www.dokwork.ru</url>
     </developer>
   </developers>

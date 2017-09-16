@@ -86,10 +86,10 @@ that you can receive as webhook or by issue GetUpdates request.
 The second is answers is the messages that your want to send to the telegram user.
 
 ### Telegram responses
-![Class diagram](http://www.plantuml.com/plantuml/png/jLGvRiCm4Epr2jO1z04LAM8aG80OEHHNXWk6Mik4QL8XASIv_XvUaaWTS1KN1hGpEqFDBaMv1hd71D0hCAWbFhs0QWHNWBupP7xYMA0R8HXWdlrc6M5OANH76Onu4bJBTE6WWRXUecqKo87MUT-U2JIQ2XxO5IWYgQiKgDIIyjhLGKeXLwA20ZqwT7lFzMxGspGLrg16dYMyRptYgBH_TLyCxDOzt5S5UX36BdeLfN0D2VVaQ_qf0YSwoGepzeR9yRa5-PdqaXWfKgBjdsQIjqt-SpqPL9PCOucqlapfKhk4N-ML-E1vY2rBWyabhG_Qzi_2NM-ePdFvv0psiS8SfzD9Oujc6Wnys65E_L1DQI_5gP-RtSQThP83DekoCl_soJgDr-3f8BH8nEVK5-HZHJInGutLDZ1LUkjyIleLBrEfAJc2_2TtvTMBpYQ-dcSTcKuSv-nYhzX86wt-Bhir7xJ3udMxaKGz1aTPZD2vs-VoebNq8V7dTfyY5mwEiCMhRJGuenpMGmg1udlDlFu0)
+![Class diagram](docs/responses.png)
 
 ### Answers
-![Class diagram](http://www.plantuml.com/plantuml/png/tPJDIiGm58NtUOeymFG52Wgw44LdBCo02-aYJMzdmiGa97UiW_hkDjFIfYt5-hCGkoda76xETsyIeH1imJZG2-LAiFILqEhZEuOtUKpljDgU5dBXM2PXfL4KWZCKMiNqtlZ_uwNM4fXAJqOBHXutUWdEiItu6etBbmeiIsRt1zEgjt3CDBDvlPoITq946sq3BzYBXzL2JDTeHJ_U0sH9jMjYuLb0EGvOLUMIEKUl90ih3d07vUVadHrXTYi_QMIBuXFakbGJE8i1p-AF0b7Q8LtZa_mdqqbs6lKqY_5o0CEPwUrO2-bNCNyuYZEwqWewY3KAlWSxZU5gmtUdyajngoD4WgSYab1Wz7RUl6makFFHmNYXCvF1BHeRWZCv5iCfDsgZz5lNqpu0)
+![Class diagram](docs/answers.png)
 
 ## How convert Twitter Future to Scala Future
 
