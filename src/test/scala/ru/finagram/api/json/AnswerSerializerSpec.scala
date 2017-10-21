@@ -1,47 +1,42 @@
 package ru.finagram.api.json
 
-import org.json4s.Extraction
 import org.json4s.native.JsonMethods._
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.prop.PropertyChecks
 import org.scalatest.{ FreeSpec, Matchers }
-import ru.finagram.api.{ MarkdownAnswer, _ }
+import ru.finagram.api._
 import ru.finagram.test.MockitoSugar
+import ru.finagram.test.arbitraries.Arbitraries
 import ru.finagram.test.matchers.Json
-
-import scala.util.Random
 
 class AnswerSerializerSpec extends FreeSpec
   with Matchers
-  with MockitoSugar {
+  with MockitoSugar
+  with PropertyChecks
+  with Arbitraries {
 
   import ru.finagram.api.json.Implicit.formats
 
   "serialization" - {
     "when serializing text answer to json" - {
-      "should be created json object with only the initialized fields" in {
+      "should be created json object with only the initialized fields" in forAll {
         // given:
-        val id = Random.nextLong()
-        val text = Random.nextString(12)
-        val answer = FlatAnswer(id, text)
+        (id: Long, text: String) =>
+          val answer = FlatAnswer(id, text)
 
-        // when:
-        val result = compactWrite(answer)
+          // when:
+          val result = compactWrite(answer)
 
-        // then:
-        result should be(
-          Json(
-            s"""
-           {
-             "chat_id": $id,
-             "text": "$text"
-           }
-        """)
-        )
+          // then:
+          result should be(
+            Json( s"""{ "chat_id": $id, "text": "$text" }""")
+          )
       }
-      "should be created json object with all initialized fields" in {
-        // given:
-        val id = Random.nextLong()
-        val text = Random.nextString(12)
-        val reply = Random.nextLong()
+    }
+    "should be created json object with all initialized fields" in forAll {
+      // given:
+      (id: Long, text: String, reply: Long) =>
         val answer = FlatAnswer(
           chatId = id,
           text = text,
@@ -70,11 +65,10 @@ class AnswerSerializerSpec extends FreeSpec
            }
         """)
         )
-      }
-      "should be created json object with expected parse_mode" in {
-        // given:
-        val id = Random.nextLong()
-        val text = Random.nextString(12)
+    }
+    "should be created json object with expected parse_mode" in forAll {
+      // given:
+      (id: Long, text: String) =>
         val answer = HtmlAnswer(id, text)
 
         // when:
@@ -91,17 +85,17 @@ class AnswerSerializerSpec extends FreeSpec
            }
         """)
         )
-      }
     }
+  }
 
-    "when serialize photo answer to json" - {
-      "should be created correct json object" in {
-        // given:
-        val answer = PhotoAnswer(
-          chatId = Random.nextLong(),
-          photo = Random.nextString(5),
-          caption = Some(Random.nextString(5))
-        )
+  "when serialize photo answer to json" - {
+    implicit val arb: Arbitrary[Option[String]] = Arbitrary {
+      Gen.some(arbitrary[String])
+    }
+    "should be created correct json object" in forAll {
+      // given:
+      (chatId: Long, photo: String, caption: Option[String]) =>
+        val answer = PhotoAnswer(chatId, photo, caption)
 
         // when:
         val result = compactWrite(answer)
@@ -118,16 +112,14 @@ class AnswerSerializerSpec extends FreeSpec
           """
           )
         )
-      }
     }
+  }
 
-    "when serialize sticker answer to json" - {
-      "should be created correct json object" in {
-        // given:
-        val answer = StickerAnswer(
-          chatId = Random.nextLong(),
-          sticker = Random.nextString(5)
-        )
+  "when serialize sticker answer to json" - {
+    "should be created correct json object" in forAll {
+      // given:
+      (chatId: Long, sticker: String) =>
+        val answer = StickerAnswer(chatId, sticker)
 
         // when:
         val result = compactWrite(answer)
@@ -143,21 +135,18 @@ class AnswerSerializerSpec extends FreeSpec
           """
           )
         )
-      }
     }
   }
 
   "deserialization" - {
     "when deserialize text answer from json" - {
-      "should be created expected object" in {
+      "should be created expected object" in forAll {
         // given:
-        val id = Random.nextLong()
-        val text = Random.nextString(12)
-        val reply = Random.nextLong()
+        (id: Long, text: String, reply: Long) =>
 
-        // when:
-        val result = parse(
-          s"""
+          // when:
+          val result = parse(
+            s"""
            {
              "chat_id": $id,
              "reply_markup": {
@@ -171,27 +160,28 @@ class AnswerSerializerSpec extends FreeSpec
            }
         """).camelizeKeys.extract[Answer]
 
-        // then:
-        result should be(MarkdownAnswer(
-          chatId = id,
-          text = text,
-          replyMarkup = new Keyboard().buttons("1", "2").createOpt(),
-          disableNotification = Some(true),
-          disableWebPagePreview = Some(true),
-          replyToMessageId = Some(reply)
-        ))
+          // then:
+          result should be(MarkdownAnswer(
+            chatId = id,
+            text = text,
+            replyMarkup = new Keyboard().buttons("1", "2").createOpt(),
+            disableNotification = Some(true),
+            disableWebPagePreview = Some(true),
+            replyToMessageId = Some(reply)
+          ))
       }
     }
     "when deserialize photo answer from json" - {
-      "should be created expected object" in {
+      implicit val arb: Arbitrary[Option[String]] = Arbitrary {
+        Gen.some(arbitrary[String])
+      }
+      "should be created expected object" in forAll {
         // given:
-        val chatId = Random.nextLong()
-        val photo = Random.nextString(5)
-        val caption = Some(Random.nextString(5))
+        (chatId: Long, photo: String, caption: Option[String]) =>
 
-        // when:
-        val result = parse(
-          s"""
+          // when:
+          val result = parse(
+            s"""
             {
                "chat_id": $chatId,
                "photo": "$photo",
@@ -199,19 +189,18 @@ class AnswerSerializerSpec extends FreeSpec
             }
           """).camelizeKeys.extract[Answer]
 
-        // then:
-        result should be(PhotoAnswer(
-          chatId = chatId,
-          photo = photo,
-          caption = caption
-        ))
+          // then:
+          result should be(PhotoAnswer(
+            chatId = chatId,
+            photo = photo,
+            caption = caption
+          ))
       }
     }
     "when deserialize sticker answer from json" - {
-      "should be created expected object" in {
+      "should be created expected object" in forAll {
         // given:
-        val chatId = Random.nextLong()
-        val sticker = Random.nextString(5)
+        (chatId: Long, sticker: String) =>
 
         // when:
         val result = parse(

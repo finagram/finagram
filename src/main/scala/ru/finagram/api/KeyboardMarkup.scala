@@ -1,7 +1,5 @@
 package ru.finagram.api
 
-import java.net.URL
-
 sealed trait KeyboardMarkup
 
 /**

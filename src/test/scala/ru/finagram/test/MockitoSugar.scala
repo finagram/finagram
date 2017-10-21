@@ -34,8 +34,8 @@ trait MockitoSugar {
    * val mockCollaborator = mock[Collaborator]
    * </pre>
    */
-  def mock[T <: AnyRef](implicit manifest: Manifest[T]): T = {
-    mockitoMock(manifest.erasure.asInstanceOf[Class[T]])
+  def mock[T <: AnyRef : Manifest]: T = {
+    mockitoMock(manifest[T].runtimeClass.asInstanceOf[Class[T]])
   }
 
   /**
@@ -60,8 +60,8 @@ trait MockitoSugar {
    * val mockCollaborator = mock[Collaborator](defaultAnswer)
    * </pre>
    */
-  def mock[T <: AnyRef](defaultAnswer: Answer[_])(implicit manifest: Manifest[T]): T = {
-    mockitoMock(manifest.erasure.asInstanceOf[Class[T]], defaultAnswer)
+  def mock[T <: AnyRef : Manifest](defaultAnswer: Answer[_]): T = {
+    mockitoMock(manifest[T].runtimeClass.asInstanceOf[Class[T]], defaultAnswer)
   }
 
   /**
@@ -86,8 +86,8 @@ trait MockitoSugar {
    * val mockCollaborator = mock[Collaborator](mockSettings)
    * </pre>
    */
-  def mock[T <: AnyRef](mockSettings: MockSettings)(implicit manifest: Manifest[T]): T = {
-    mockitoMock(manifest.erasure.asInstanceOf[Class[T]], mockSettings)
+  def mock[T <: AnyRef : Manifest](mockSettings: MockSettings): T = {
+    mockitoMock(manifest[T].runtimeClass.asInstanceOf[Class[T]], mockSettings)
   }
 
   /**
@@ -112,8 +112,8 @@ trait MockitoSugar {
    * val mockCollaborator = mock[Collaborator](name)
    * </pre>
    */
-  def mock[T <: AnyRef](name: String)(implicit manifest: Manifest[T]): T = {
-    mockitoMock(manifest.erasure.asInstanceOf[Class[T]], name)
+  def mock[T <: AnyRef : Manifest](name: String): T = {
+    mockitoMock(manifest[T].runtimeClass.asInstanceOf[Class[T]], name)
   }
 
   /**
@@ -136,7 +136,7 @@ trait MockitoSugar {
    * </pre>
    */
   // TODO remove when pull request https://github.com/scalatest/scalatest/pull/546 will accepted
-  def any[T <: Any](implicit manifest: Manifest[T]): T = {
+  def any[T <: Any]: T = {
     org.mockito.Matchers.any(manifest.runtimeClass.asInstanceOf[Class[T]])
   }
 
@@ -160,7 +160,7 @@ trait MockitoSugar {
    * </pre>
    */
   // TODO remove when pull request https://github.com/scalatest/scalatest/pull/867 will accepted
-  def argumentCaptor[T <: Any](implicit manifest: Manifest[T]): ArgumentCaptor[T] = {
+  def argumentCaptor[T <: Any]: ArgumentCaptor[T] = {
     ArgumentCaptor.forClass(manifest.runtimeClass.asInstanceOf[Class[T]])
   }
 
@@ -228,7 +228,7 @@ trait MockitoSugar {
     new BaseMatcher[T] {
       override def matches(item: scala.Any) = f == item
 
-      override def describeTo(description: Description) = ""
+      override def describeTo(description: Description) = {}
     }
   )
 }
