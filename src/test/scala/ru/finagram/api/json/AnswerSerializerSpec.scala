@@ -9,7 +9,9 @@ import ru.finagram.test.matchers.Json
 
 import scala.util.Random
 
-class AnswerSerializerSpec extends FreeSpec with Matchers with MockitoSugar {
+class AnswerSerializerSpec extends FreeSpec
+  with Matchers
+  with MockitoSugar {
 
   import ru.finagram.api.json.Implicit.formats
 
